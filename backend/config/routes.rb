@@ -26,6 +26,10 @@ Rails.application.routes.draw do
       resources :events
       resources :users do
         resources :reviews, only: [:index]
+        member do
+          get :friendships
+          post :friendships, to: 'users#create_friendship'
+        end
       end
       
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
