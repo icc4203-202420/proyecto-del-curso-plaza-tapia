@@ -1,6 +1,9 @@
 class API::V1::UsersController < ApplicationController
+  include Authenticable
+
   respond_to :json
-  before_action :set_user, only: [:show, :update]  
+  before_action :set_user, only: [:show, :update, :friendships, :create_friendship]
+  before_action :verify_jwt_token, only: [:update, :destroy, :create_friendship]  
   
   def index
     @users = User.includes(:reviews, :address).all   
@@ -26,6 +29,26 @@ class API::V1::UsersController < ApplicationController
     else
       render json: @user.errors, status: :unprocessable_entity
     end
+  end
+
+  def friendships
+    friendships = @user.friendships.map do |friendship|
+      User.find(friendship.friend_id)
+    end
+    render json: friendships, status: :ok
+  end
+
+  def create_friendship
+    friend = User.find(params[:friend_id])
+    if @user.friendships.create(friend_id: friend.id)
+      render json: { message: 'Friendship created successfully.' }, status: :ok
+    else
+      render json: { error: 'Error creating friendship.' }, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    
   end
 
   private
