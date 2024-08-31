@@ -1,22 +1,45 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, IconButton, BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { Settings, MoreVert, LocationOn, Favorite, LocalBar } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, IconButton, BottomNavigation, BottomNavigationAction, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText } from '@mui/material';
+import { ExpandMore, LocationOn, Favorite, LocalBar } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
+  const [accordionOpen, setAccordionOpen] = useState(false);
+
+  const handleMenuClick = () => {
+    setAccordionOpen(prev => !prev);
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#ffffff' }}>
       {/* Barra de navegación superior fija */}
       <AppBar position="fixed" color="default">
         <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="settings">
-            <Settings />
+          <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleMenuClick}>
+            <ExpandMore />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
             BarSocial
           </Typography>
           <Button color="inherit">Profile</Button>
         </Toolbar>
+        {accordionOpen && (
+          <Accordion expanded={accordionOpen} sx={{ width: '100%' }}>
+            <AccordionDetails>
+              <List>
+                <ListItem button component={Link} to="/users">
+                  <ListItemText primary="Users" />
+                </ListItem>
+                <ListItem button component={Link} to="/option1">
+                  <ListItemText primary="Option 1" />
+                </ListItem>
+                <ListItem button component={Link} to="/option2">
+                  <ListItemText primary="Option 2" />
+                </ListItem>
+              </List>
+            </AccordionDetails>
+          </Accordion>
+        )}
       </AppBar>
 
       {/* Espaciado para evitar que el contenido quede debajo de la AppBar */}
@@ -32,9 +55,6 @@ const Home = () => {
                 <Typography color="textSecondary">
                   Find your friends’ beers
                 </Typography>
-                <IconButton aria-label="more" sx={{ position: 'absolute', top: 8, right: 8 }}>
-                  <MoreVert />
-                </IconButton>
               </CardContent>
             </Card>
           </Grid>
@@ -46,9 +66,6 @@ const Home = () => {
                 <Typography color="textSecondary">
                   Top bars of the week
                 </Typography>
-                <IconButton aria-label="more" sx={{ position: 'absolute', top: 8, right: 8 }}>
-                  <MoreVert />
-                </IconButton>
               </CardContent>
             </Card>
           </Grid>
@@ -60,9 +77,6 @@ const Home = () => {
                 <Typography color="textSecondary">
                   Your favorite bars
                 </Typography>
-                <IconButton aria-label="more" sx={{ position: 'absolute', top: 8, right: 8 }}>
-                  <MoreVert />
-                </IconButton>
               </CardContent>
             </Card>
           </Grid>
@@ -74,9 +88,6 @@ const Home = () => {
                 <Typography color="textSecondary">
                   Your favorite beers
                 </Typography>
-                <IconButton aria-label="more" sx={{ position: 'absolute', top: 8, right: 8 }}>
-                  <MoreVert />
-                </IconButton>
               </CardContent>
             </Card>
           </Grid>

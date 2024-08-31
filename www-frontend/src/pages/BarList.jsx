@@ -23,8 +23,8 @@ const BarsList = () => {
         setSearchHistory(history);
   
         if (history.length > 0) {
-          const filtered = barsData.filter(bar =>
-            history.some(term => bar.name.toLowerCase().includes(term.toLowerCase()))
+          const filtered = barsData.filter(beer =>
+            history.some(term => beer.name.toLowerCase().includes(term.toLowerCase()))
           );
           setFilteredBars(filtered);
         } else {
@@ -45,9 +45,9 @@ const BarsList = () => {
         // Si no hay término de búsqueda, mostrar basado en historial
         const barsData = [...bars];
         if (searchHistory.length > 0) {
-          const filtered = barsData.filter(bar =>
+          const filtered = barsData.filter(beer =>
             searchHistory.some(term =>
-              bar.name.toLowerCase().includes(term.toLowerCase())
+              beer.name.toLowerCase().includes(term.toLowerCase())
             )
           );
           setFilteredBars(filtered);
@@ -55,10 +55,10 @@ const BarsList = () => {
           setFilteredBars(barsData.sort((a, b) => a.name.localeCompare(b.name)));
         }
       } else {
-        // Filtrar bares según el término de búsqueda
+        // Filtrar cervezas según el término de búsqueda
         const lowercasedTerm = searchTerm.toLowerCase();
-        const filtered = bars.filter(bar =>
-          bar.name.toLowerCase().includes(lowercasedTerm)
+        const filtered = bars.filter(beer =>
+          beer.name.toLowerCase().includes(lowercasedTerm)
         );
         setFilteredBars(filtered);
 
@@ -85,7 +85,7 @@ const BarsList = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minWidth: '200%', minHeight: '100vh', backgroundColor: '#ffffff' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: window.innerWidth, backgroundColor: '#ffffff' }}>
       {/* Barra de búsqueda superior */}
       <AppBar position="fixed" color="default" sx={{ width: '100%' }}>
         <Toolbar>
@@ -112,20 +112,20 @@ const BarsList = () => {
       <Toolbar />
 
       {/* Contenedor principal */}
-      <Button minHeight variant="text" sx={{ mt: 1 }}>
+      <Button variant="text" sx={{ mt: 3 }}>
         View History
       </Button>
-      <Container centered sx={{ width: '100%'}}>
+      <Container sx={{ width: '100%' }}>
         <List>
           {filteredBars.length > 0 ? (
-            filteredBars.map((bar) => (
-              <ListItem key={bar.id} button>
+            filteredBars.map((beer) => (
+              <ListItem key={beer.id} button>
                 <ListItemAvatar>
-                  <Avatar>{bar.name[0]}</Avatar> {/* Muestra la primera letra del nombre del bar */}
+                  <Avatar>{beer.name[0]}</Avatar> {/* Muestra la primera letra del nombre de la cerveza */}
                 </ListItemAvatar>
                 <ListItemText
-                  primary={bar.name}
-                  secondary={`Address ID: ${bar.address_id}`}
+                  primary={beer.name}
+                  secondary={`Brewery: ${beer.brewery}`} // Asegúrate de tener un campo adecuado en tus datos
                   primaryTypographyProps={{ style: { color: 'black' } }} // Cambia el color del texto principal a negro
                 />
               </ListItem>
@@ -137,13 +137,6 @@ const BarsList = () => {
           )}
         </List>
       </Container>
-
-      {/* Barra de navegación inferior */}
-      <BottomNavigation showLabels sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
-        <BottomNavigationAction label="Home" icon={<LocationOn />} onClick={handleBarsClick} />
-        <BottomNavigationAction label="Favorites" icon={<Favorite />} />
-        <BottomNavigationAction label="Beers" icon={<LocalBar />} />
-      </BottomNavigation>
     </div>
   );
 };

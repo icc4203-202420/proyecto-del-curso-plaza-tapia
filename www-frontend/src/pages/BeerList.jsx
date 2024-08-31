@@ -85,7 +85,7 @@ const BeersList = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minWidth: '100%', minHeight: '100vh', backgroundColor: '#ffffff' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: window.innerWidth, minHeight: '100vh', backgroundColor: '#ffffff' }}>
       {/* Barra de búsqueda superior */}
       <AppBar position="fixed" color="default" sx={{ width: '100%' }}>
         <Toolbar>
@@ -137,13 +137,6 @@ const BeersList = () => {
           )}
         </List>
       </Container>
-
-      {/* Barra de navegación inferior */}
-      <BottomNavigation showLabels sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
-        <BottomNavigationAction label="Bars" icon={<LocationOn />} onClick={handleBarsClick} />
-        <BottomNavigationAction label="Favorites" icon={<Favorite />} />
-        <BottomNavigationAction label="Beers" icon={<LocalBar />} />
-      </BottomNavigation>
     </div>
   );
 };
