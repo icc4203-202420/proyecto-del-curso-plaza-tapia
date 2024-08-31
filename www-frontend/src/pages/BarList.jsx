@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { AppBar, Toolbar, IconButton, InputBase, Container, List, ListItem, ListItemAvatar, Avatar, ListItemText, Button, BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { ArrowBack, Search, FilterList, LocationOn, Favorite, LocalBar } from '@mui/icons-material';
+import { AppBar, Toolbar, IconButton, InputBase, Container, List, ListItem, ListItemAvatar, Avatar, ListItemText, Button } from '@mui/material';
+import { ArrowBack, Search, FilterList } from '@mui/icons-material';
 
 const BarsList = () => {
   const [bars, setBars] = useState([]);
@@ -23,8 +23,8 @@ const BarsList = () => {
         setSearchHistory(history);
   
         if (history.length > 0) {
-          const filtered = barsData.filter(beer =>
-            history.some(term => beer.name.toLowerCase().includes(term.toLowerCase()))
+          const filtered = barsData.filter(bar =>
+            history.some(term => bar.name.toLowerCase().includes(term.toLowerCase()))
           );
           setFilteredBars(filtered);
         } else {
@@ -37,7 +37,6 @@ const BarsList = () => {
   
     fetchBars();
   }, []);
-  
 
   useEffect(() => {
     const filterBars = () => {
@@ -45,9 +44,9 @@ const BarsList = () => {
         // Si no hay término de búsqueda, mostrar basado en historial
         const barsData = [...bars];
         if (searchHistory.length > 0) {
-          const filtered = barsData.filter(beer =>
+          const filtered = barsData.filter(bar =>
             searchHistory.some(term =>
-              beer.name.toLowerCase().includes(term.toLowerCase())
+              bar.name.toLowerCase().includes(term.toLowerCase())
             )
           );
           setFilteredBars(filtered);
@@ -55,10 +54,10 @@ const BarsList = () => {
           setFilteredBars(barsData.sort((a, b) => a.name.localeCompare(b.name)));
         }
       } else {
-        // Filtrar cervezas según el término de búsqueda
+        // Filtrar bares según el término de búsqueda
         const lowercasedTerm = searchTerm.toLowerCase();
-        const filtered = bars.filter(beer =>
-          beer.name.toLowerCase().includes(lowercasedTerm)
+        const filtered = bars.filter(bar =>
+          bar.name.toLowerCase().includes(lowercasedTerm)
         );
         setFilteredBars(filtered);
 
@@ -76,8 +75,8 @@ const BarsList = () => {
     navigate('/');
   };
 
-  const handleBarsClick = () => {
-    navigate('/');
+  const handleBarClick = (id) => {
+    navigate(`/bars/${id}/events`); // Ajusta la ruta según sea necesario
   };
 
   const handleSearchChange = (event) => {
@@ -118,14 +117,14 @@ const BarsList = () => {
       <Container sx={{ width: '100%' }}>
         <List>
           {filteredBars.length > 0 ? (
-            filteredBars.map((beer) => (
-              <ListItem key={beer.id} button>
+            filteredBars.map((bar) => (
+              <ListItem key={bar.id} button onClick={() => handleBarClick(bar.id)}>
                 <ListItemAvatar>
-                  <Avatar>{beer.name[0]}</Avatar> {/* Muestra la primera letra del nombre de la cerveza */}
+                  <Avatar>{bar.name[0]}</Avatar> {/* Muestra la primera letra del nombre del bar */}
                 </ListItemAvatar>
                 <ListItemText
-                  primary={beer.name}
-                  secondary={`Brewery: ${beer.brewery}`} // Asegúrate de tener un campo adecuado en tus datos
+                  primary={bar.name}
+                  secondary={`Location: ${bar.location}`} // Asegúrate de tener un campo adecuado en tus datos
                   primaryTypographyProps={{ style: { color: 'black' } }} // Cambia el color del texto principal a negro
                 />
               </ListItem>
