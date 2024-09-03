@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Container, List, ListItem, ListItemText, Typography, CircularProgress, Paper, AppBar, Toolbar, IconButton } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 
@@ -14,9 +14,9 @@ const BarEvents = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:3001/api/v1/events/${id}`);
+        const response = await axios.get(`http://127.0.0.1:3001/api/v1/bars/${id}/events`);
         console.log('API response:', response.data); // Verifica la estructura de la respuesta
-        setEvents(response.data.events || response.data); // Ajusta según la estructura real de la respuesta
+        setEvents(response.data.events); // Ajusta según la estructura real de la respuesta
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -39,7 +39,7 @@ const BarEvents = () => {
             <ArrowBack />
           </IconButton>
           <Typography variant="h6" sx={{ flex: 1 }}>
-            Events at Bar
+            Events at Bar ({id})
           </Typography>
         </Toolbar>
       </AppBar>
