@@ -3,7 +3,7 @@ class API::V1::BarsController < ApplicationController
   include Authenticable
 
   respond_to :json
-  before_action :set_bar, only: [:show, :update, :destroy]
+  before_action :set_bar, only: [:show, :update, :destroy, :events]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   def index
@@ -50,7 +50,12 @@ class API::V1::BarsController < ApplicationController
     else
       render json: @bar.errors, status: :unprocessable_entity
     end
-  end  
+  end
+
+  def events
+    events = @bar.events
+    render json: { events: events }, status: :ok
+  end
 
   private
 
