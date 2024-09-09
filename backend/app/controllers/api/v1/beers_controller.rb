@@ -85,4 +85,7 @@ class API::V1::BeersController < ApplicationController
     authenticate_user!
     head :unauthorized unless current_user
   end  
+
+  
 end
+
