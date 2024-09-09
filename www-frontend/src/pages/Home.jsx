@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, IconButton, BottomNavigation, BottomNavigationAction, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText } from '@mui/material';
 import { ExpandMore, LocationOn, Favorite, LocalBar } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import LogoutButton from '../components/LogoutButton';
 
 const Home = () => {
   const [accordionOpen, setAccordionOpen] = useState(false);
@@ -21,7 +22,8 @@ const Home = () => {
           <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
             BarSocial
           </Typography>
-          <Button color="inherit">Profile</Button>
+          <Button color="inherit" component={Link} to="/login">Login</Button>
+          <LogoutButton />
         </Toolbar>
         {accordionOpen && (
           <Accordion expanded={accordionOpen} sx={{ width: '100%' }}>
