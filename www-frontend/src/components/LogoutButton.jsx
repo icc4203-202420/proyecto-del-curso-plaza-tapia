@@ -6,9 +6,15 @@ import { logout } from '../services/authService';
 const LogoutButton = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      console.log('Attempting logout...');
+      await logout();
+      console.log('Logout successful');
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
   };
 
   return (

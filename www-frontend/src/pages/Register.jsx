@@ -83,15 +83,6 @@ const Register = () => {
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <TextField
-                    label="Age"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    type="number"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                />
-                <TextField
                     label="Password"
                     variant="outlined"
                     fullWidth

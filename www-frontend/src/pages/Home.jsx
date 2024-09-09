@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, IconButton, BottomNavigation, BottomNavigationAction, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText } from '@mui/material';
-import { ExpandMore, LocationOn, Favorite, LocalBar } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
-import LogoutButton from '../components/LogoutButton';
+import { Toolbar, Typography, Container, Grid, Card, CardContent } from '@mui/material';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const Home = () => {
   const [accordionOpen, setAccordionOpen] = useState(false);
@@ -13,38 +12,8 @@ const Home = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#ffffff' }}>
-      {/* Barra de navegación superior fija */}
-      <AppBar position="fixed" color="default">
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleMenuClick}>
-            <ExpandMore />
-          </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-            BarSocial
-          </Typography>
-          <Button color="inherit" component={Link} to="/login">Login</Button>
-          <LogoutButton />
-        </Toolbar>
-        {accordionOpen && (
-          <Accordion expanded={accordionOpen} sx={{ width: '100%' }}>
-            <AccordionDetails>
-              <List>
-                <ListItem button component={Link} to="/users">
-                  <ListItemText primary="Users" />
-                </ListItem>
-                <ListItem button component={Link} to="/option1">
-                  <ListItemText primary="Option 1" />
-                </ListItem>
-                <ListItem button component={Link} to="/option2">
-                  <ListItemText primary="Option 2" />
-                </ListItem>
-              </List>
-            </AccordionDetails>
-          </Accordion>
-        )}
-      </AppBar>
+      <Header handleMenuClick={handleMenuClick} accordionOpen={accordionOpen} />
 
-      {/* Espaciado para evitar que el contenido quede debajo de la AppBar */}
       <Toolbar />
 
       {/* Contenido principal */}
@@ -96,25 +65,8 @@ const Home = () => {
         </Grid>
       </Container>
 
-      {/* Barra de navegación inferior */}
-      <BottomNavigation showLabels sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
-        <BottomNavigationAction
-          label="Bars"
-          icon={<LocationOn />}
-          component={Link} 
-          to="/bars"
-        />
-        <BottomNavigationAction
-          label="Favorites"
-          icon={<Favorite />}
-        />
-        <BottomNavigationAction 
-          label="Beers" 
-          icon={<LocalBar />}
-          component={Link} 
-          to="/beers"
-        />
-      </BottomNavigation>
+      <Footer />
+      
     </div>
   );
 };

@@ -14,8 +14,26 @@ export const login = async (email, password) => {
   }
 };
 
-export const logout = () => {
-  localStorage.removeItem('user');
+export const logout = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.token) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      return;
+    }
+
+    const response = await axios.delete(`${API_URL}/logout`, {
+      headers: {
+        Authorization: `Bearer ${user.token}`
+      }
+    });
+
+    localStorage.removeItem('user');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getCurrentUser = () => {

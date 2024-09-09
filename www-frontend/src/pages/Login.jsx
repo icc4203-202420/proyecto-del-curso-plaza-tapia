@@ -8,17 +8,18 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      const userData = await login(email, password);
+      localStorage.setItem('token', userData.token);
+      localStorage.setItem('currentUser', JSON.stringify(userData.user));
+      console.log('Login successful', userData);
       navigate('/');
     } catch (error) {
       console.error('Login failed', error);
     }
   };
-
   return (
     <Container maxWidth="xs">
       <Typography variant="h4" align="center" gutterBottom>
