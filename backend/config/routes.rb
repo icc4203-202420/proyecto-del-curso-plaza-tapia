@@ -26,7 +26,11 @@ Rails.application.routes.draw do
           get 'events', to: 'bars#events'
         end
       end
-      resources :beers
+      resources :beers do
+        member do
+          get 'bars', to: 'beers#bars'  # Custom route to fetch bars for a specific beer
+        end
+      end
       resources :events
       resources :users do
         resources :reviews, only: [:index]

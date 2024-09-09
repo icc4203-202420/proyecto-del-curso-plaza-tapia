@@ -3,7 +3,7 @@ class API::V1::BeersController < ApplicationController
   include Authenticable
 
   respond_to :json
-  before_action :set_beer, only: [:show, :update, :destroy]
+  before_action :set_beer, only: [:show, :update, :destroy, :bars]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   # GET /beers
@@ -11,13 +11,6 @@ class API::V1::BeersController < ApplicationController
     @beers = Beer.all
     render json: { beers: @beers }, status: :ok
   end
-
-  # def index
-  #   @beers = Rails.cache.fetch("beers", expires_in: 12.hours) do
-  #     Beer.includes(:brand, :brewery).all
-  #   end
-  #   render json: @beers
-  # end
   
   # GET /beers/:id
   def show
@@ -60,6 +53,14 @@ class API::V1::BeersController < ApplicationController
     head :no_content
   end
 
+  # GET /beers/:id/bars
+  def bars
+    bars = @beer.bars # Assuming Beer has many Bars through a join table
+    render json: { bars: bars }, status: :ok
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Beer not found' }, status: :not_found
+  end
+
   private
 
   def set_beer
@@ -68,21 +69,16 @@ class API::V1::BeersController < ApplicationController
   end  
 
   def beer_params
-    params.require(:beer).permit(:name, :beer_type, 
-      :style, :hop, :yeast, :malts, 
-      :ibu, :alcohol, :blg, :brand_id, :avg_rating,
-      :image_base64)
+    params.require(:beer).permit(:name, :beer_type, :style, :hop, :yeast, :malts, :ibu, :alcohol, :blg, :brand_id, :avg_rating, :image_base64)
   end
 
   def handle_image_attachment
     decoded_image = decode_image(beer_params[:image_base64])
-    @beer.image.attach(io: decoded_image[:io], 
-      filename: decoded_image[:filename], 
-      content_type: decoded_image[:content_type])
-  end 
-  
+    @beer.image.attach(io: decoded_image[:io], filename: decoded_image[:filename], content_type: decoded_image[:content_type])
+  end
+
   def verify_jwt_token
     authenticate_user!
     head :unauthorized unless current_user
-  end  
+  end
 end
