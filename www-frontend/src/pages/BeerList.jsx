@@ -85,7 +85,7 @@ const BeersList = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: window.innerWidth, minHeight: '100vh', backgroundColor: '#ffffff' }}>
+    <Container sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 2, height: 'auto' }}>
       <AppBar position="fixed" color="default" sx={{ width: '100%' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="back" onClick={handleBackClick}>
@@ -134,7 +134,7 @@ const BeersList = () => {
           )}
         </List>
       </Container>
-    </div>
+    </Container>
   );
 };
 

@@ -1,25 +1,42 @@
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { LocationOn, Favorite, LocalBar } from '@mui/icons-material';
+import { Home, SportsBar, LocationOn } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
-        <BottomNavigation showLabels sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
+        <BottomNavigation
+            sx={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                justifyContent: 'center',
+                height: '80px',
+                borderTop: '1px solid #ddd',
+                bgcolor: '#fff'
+            }}
+        >
             <BottomNavigationAction
-                label="Bars"
                 icon={<LocationOn />}
-                component={Link} 
+                component={Link}
                 to="/bars"
+                sx={{ minWidth: 'auto' }}
             />
+
             <BottomNavigationAction
-                label="Favorites"
-                icon={<Favorite />}
+                icon={<Home sx={{ fontSize: 40 }} />}
+                component={Link}
+                to="/"
+                sx={{
+                    minWidth: 'auto',
+                }}
             />
-            <BottomNavigationAction 
-                label="Beers" 
-                icon={<LocalBar />}
-                component={Link} 
+
+            <BottomNavigationAction
+                icon={<SportsBar />}
+                component={Link}
                 to="/beers"
+                sx={{ minWidth: 'auto' }}
             />
         </BottomNavigation>
     );

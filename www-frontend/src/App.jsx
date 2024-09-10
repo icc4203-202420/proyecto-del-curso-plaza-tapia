@@ -9,23 +9,38 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import PrivateRoute from './components/PrivateRoute';
 import BeerDetails from './pages/BeerDetails';
+import ScrollToTop from './services/ScrollToTop';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import { Container } from '@mui/material';
 
 const App = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+      <ScrollToTop>
+      <Container
+            sx={{
+                backgroundColor: '#ffffff',
+                paddingBottom: '80px',
+            }}
+        >
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
 
-        <Route element={<PrivateRoute />}>
-          <Route path="/beers" element={<BeerList />} />
-          <Route path="/beers/:id" element={<BeerDetails />} />
-          <Route path="/bars" element={<BarList />} />
-          <Route path="/bars/:id/events" element={<BarEvents />} />
-          <Route path="/users" element={<UserSearch />} />
-        </Route>
-      </Routes>
+            <Route element={<PrivateRoute />}>
+              <Route path="/beers" element={<BeerList />} />
+              <Route path="/beers/:id" element={<BeerDetails />} />
+              <Route path="/bars" element={<BarList />} />
+              <Route path="/bars/:id/events" element={<BarEvents />} />
+              <Route path="/users" element={<UserSearch />} />
+            </Route>
+          </Routes>
+          <Footer />
+        </Container>
+      </ScrollToTop>
     </Router>
   );
 };

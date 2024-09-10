@@ -84,7 +84,7 @@ const BarsList = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: window.innerWidth, backgroundColor: '#ffffff' }}>
+    <Container sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 2, height: 'auto' }}>
       {/* Barra de búsqueda superior */}
       <AppBar position="fixed" color="default" sx={{ width: '100%' }}>
         <Toolbar>
@@ -136,7 +136,7 @@ const BarsList = () => {
           )}
         </List>
       </Container>
-    </div>
+    </Container>
   );
 };
 
