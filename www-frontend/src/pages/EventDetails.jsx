@@ -17,7 +17,7 @@ const EventDetails = () => {
                 const response = await axios.get(`http://127.0.0.1:3001/api/v1/events/${id}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
-                setEvent(response.data);
+                setEvent(response.data.event);
                 setLoading(false);
             } catch (err) {
                 setError(err.message);
@@ -30,6 +30,7 @@ const EventDetails = () => {
 
     if (loading) return <CircularProgress />;
     if (error) return <Typography color="error">{error}</Typography>;
+
 
     return (
         <Container sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 2, height: 'auto' }}>
@@ -53,7 +54,7 @@ const EventDetails = () => {
                             <Typography variant="h4">{event.name}</Typography>
                             <Typography><strong>Description:</strong> {event.description}</Typography>
                             <Typography><strong>Date:</strong> {new Date(event.date).toLocaleDateString()}</Typography>
-                            <Typography><strong>Location:</strong> {event.location || 'N/A'}</Typography>
+                            <Typography><strong>Users placeholder:</strong></Typography>
                         </>
                     )}
                 </Paper>
