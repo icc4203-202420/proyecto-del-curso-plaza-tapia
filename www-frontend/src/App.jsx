@@ -19,11 +19,11 @@ const App = () => {
   return (
     <Router>
       <ScrollToTop>
-      <Container
-            sx={{
-                backgroundColor: '#ffffff',
-                paddingBottom: '80px',
-            }}
+        <Container
+          sx={{
+            backgroundColor: '#ffffff',
+            paddingBottom: '80px',
+          }}
         >
           <Header />
           <Routes>
@@ -39,6 +39,7 @@ const App = () => {
               <Route path="/bars/:id/events" element={<BarEvents />} />
               <Route path="/users" element={<UserSearch />} />
               <Route path="/new-review/:id" element={<NewReview />} />
+              <Route path="/events/:id" element={<EventDetails />} />
             </Route>
 
           </Routes>
