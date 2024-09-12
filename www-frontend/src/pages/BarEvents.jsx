@@ -16,7 +16,7 @@ const BarEvents = () => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get(`http://127.0.0.1:3001/api/v1/bars/${id}/events`, {
-          headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         console.log('API response:', response.data);
         setEvents(response.data.events);
@@ -31,19 +31,23 @@ const BarEvents = () => {
     fetchEvents();
   }, [id]);
 
+  const handleEventClick = (eventId) => {
+    // Navigate to the event's detail view
+    navigate(`/events/${eventId}`);
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Container sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 2, height: 'auto' }}>
-
       <AppBar position="fixed" color="default" sx={{ width: '100%' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="back" onClick={() => navigate('/')}>
             <ArrowBack />
           </IconButton>
           <Typography variant="h6" sx={{ flex: 1 }}>
-            Events at {bar}
+            Events at {bar?.name || 'Loading...'}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -55,7 +59,7 @@ const BarEvents = () => {
           <List>
             {events.length > 0 ? (
               events.map(event => (
-                <ListItem key={event.id}>
+                <ListItem button key={event.id} onClick={() => handleEventClick(event.id)}>
                   <ListItemText
                     primary={event.name}
                     secondary={

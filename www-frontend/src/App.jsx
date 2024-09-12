@@ -14,6 +14,7 @@ import ScrollToTop from './services/ScrollToTop';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { Container } from '@mui/material';
+import EventDetails from './pages/EventDetails';
 
 const App = () => {
   return (
