@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import PrivateRoute from './components/PrivateRoute';
 import BeerDetails from './pages/BeerDetails';
+import NewReview from './pages/NewReview';
 import ScrollToTop from './services/ScrollToTop';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -26,6 +27,7 @@ const App = () => {
         >
           <Header />
           <Routes>
+
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
@@ -36,7 +38,9 @@ const App = () => {
               <Route path="/bars" element={<BarList />} />
               <Route path="/bars/:id/events" element={<BarEvents />} />
               <Route path="/users" element={<UserSearch />} />
+              <Route path="/new-review/:id" element={<NewReview />} />
             </Route>
+
           </Routes>
           <Footer />
         </Container>

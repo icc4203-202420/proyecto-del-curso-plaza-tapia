@@ -1,6 +1,7 @@
 class API::V1::SessionsController < Devise::SessionsController
   respond_to :json
   skip_before_action :verify_signed_out_user, only: :destroy
+  skip_before_action :authorize_request, only: [:create]
 
   private
 
@@ -9,7 +10,7 @@ class API::V1::SessionsController < Devise::SessionsController
     render json: {
       status: { code: 200, message: 'Logged in successfully.' },
       token: token,
-      user: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
+      user_id: current_user.id, 
     }, status: :ok
   end
 

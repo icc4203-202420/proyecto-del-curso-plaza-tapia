@@ -14,7 +14,10 @@ const BarsList = () => {
   useEffect(() => {
     const fetchBars = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:3001/api/v1/bars');
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://127.0.0.1:3001/api/v1/bars', {
+          headers: {Authorization: `Bearer ${token}`}
+        });
         console.log(response.data); // Verifica los datos recibidos
         const barsData = response.data.bars;
         setBars(barsData);

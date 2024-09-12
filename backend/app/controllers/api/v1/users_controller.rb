@@ -3,7 +3,8 @@ class API::V1::UsersController < ApplicationController
 
   respond_to :json
   before_action :set_user, only: [:show, :update, :friendships, :create_friendship]
-  before_action :verify_jwt_token, only: [:update, :destroy, :create_friendship]  
+  before_action :verify_jwt_token, only: [:update, :destroy, :create_friendship]
+  skip_before_action :authorize_request, only: [:create]
   
   def index
     @users = User.includes(:reviews, :address).all   
@@ -23,7 +24,6 @@ class API::V1::UsersController < ApplicationController
   end
 
   def update
-    #byebug
     if @user.update(user_params)
       render :show, status: :ok, location: api_v1_users_path(@user)
     else

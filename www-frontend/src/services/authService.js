@@ -14,12 +14,28 @@ export const login = async (email, password) => {
   }
 };
 
+export const getProtectedResource = async () => {
+  const token = localStorage.getItem('token');
+  console.log('Token:', token);
+  try {
+    const response = await axios.get(`${API_URL}/beers`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const logout = async () => {
   try {
     const token = localStorage.getItem('token');
     if (token) {
       console.log('User logged in');
       localStorage.removeItem('token');
+      localStorage.removeItem('user_id');
       return;
     }
     return;

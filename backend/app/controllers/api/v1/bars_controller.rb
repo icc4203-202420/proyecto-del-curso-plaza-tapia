@@ -54,7 +54,7 @@ class API::V1::BarsController < ApplicationController
 
   def events
     events = @bar.events
-    render json: { events: events }, status: :ok
+    render json: { events: events, bar: @bar.name }, status: :ok
   end
 
   private

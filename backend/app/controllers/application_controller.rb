@@ -1,8 +1,26 @@
+require 'json_web_token'
+
 class ApplicationController < ActionController::API
-  before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :authorize_request
+  attr_reader :current_user
+
   protected
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: %i[name avatar])
-    devise_parameter_sanitizer.permit(:account_update, keys: %i[name avatar])
+
+  def authorize_request
+    auth_header = request.headers['Authorization']
+    
+    if auth_header.present?
+      token = auth_header.split(' ').last if auth_header.present?
+      begin
+        decoded = JsonWebToken.decode(token)
+        @current_user = User.find(decoded[:user_id]) if decoded
+        Rails.logger.info "Current user: #{@current_user.inspect}"
+      rescue ActiveRecord::RecordNotFound, JWT::DecodeError => e
+        render json: { errors: e.message }, status: :unauthorized
+      end
+    else
+      render json: { errors: 'Authorization token missing' }, status: :unauthorized
+    end
   end
+  
 end

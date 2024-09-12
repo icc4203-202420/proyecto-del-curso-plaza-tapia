@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AppBar, Toolbar, IconButton, InputBase, Container, List, ListItem, ListItemAvatar, Avatar, ListItemText, Button, BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { ArrowBack, Search, FilterList, LocationOn, Favorite, LocalBar } from '@mui/icons-material';
+import { ArrowBack, Search, FilterList } from '@mui/icons-material';
 
 const BeersList = () => {
   const [beers, setBeers] = useState([]);
@@ -14,7 +14,10 @@ const BeersList = () => {
   useEffect(() => {
     const fetchBeers = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:3001/api/v1/beers');
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://127.0.0.1:3001/api/v1/beers', {
+          headers: {Authorization: `Bearer ${token}`}
+        });
         const beersData = response.data.beers;
         setBeers(beersData);
 

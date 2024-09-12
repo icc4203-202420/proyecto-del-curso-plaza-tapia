@@ -5,7 +5,8 @@ import { Container, List, ListItem, ListItemText, Typography, CircularProgress, 
 import { ArrowBack } from '@mui/icons-material';
 
 const BarEvents = () => {
-  const { id } = useParams(); // Obtener el ID del bar de la URL
+  const { id } = useParams();
+  const [bar, setBar] = useState(null);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,9 +15,12 @@ const BarEvents = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:3001/api/v1/bars/${id}/events`);
-        console.log('API response:', response.data); // Verifica la estructura de la respuesta
-        setEvents(response.data.events); // Ajusta según la estructura real de la respuesta
+        const response = await axios.get(`http://127.0.0.1:3001/api/v1/bars/${id}/events`, {
+          headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
+        });
+        console.log('API response:', response.data);
+        setEvents(response.data.events);
+        setBar(response.data.bar);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -31,23 +35,21 @@ const BarEvents = () => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#ffffff' }}>
-      {/* Barra de título */}
+    <Container sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 2, height: 'auto' }}>
+
       <AppBar position="fixed" color="default" sx={{ width: '100%' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="back" onClick={() => navigate('/')}>
             <ArrowBack />
           </IconButton>
           <Typography variant="h6" sx={{ flex: 1 }}>
-            Events at Bar ({id})
+            Events at {bar}
           </Typography>
         </Toolbar>
       </AppBar>
 
-      {/* Espaciado para evitar que el contenido quede debajo de la AppBar */}
       <Toolbar />
 
-      {/* Contenedor principal */}
       <Container sx={{ mt: 8, mb: 4, bgcolor: '#ffffff', minHeight: '100vh', width: window.innerWidth }}>
         <Paper elevation={3} sx={{ p: 2 }}>
           <List>
@@ -75,7 +77,7 @@ const BarEvents = () => {
           </List>
         </Paper>
       </Container>
-    </div>
+    </Container>
   );
 };
 
