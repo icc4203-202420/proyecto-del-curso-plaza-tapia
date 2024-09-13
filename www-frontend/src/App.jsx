@@ -1,18 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import BeerList from './pages/BeerList';
-import BarList from './pages/BarList';
-import BarEvents from './pages/BarEvents';
-import UserSearch from './pages/UserSearch';
-import Register from './pages/Register';
-import Login from './pages/Login';
-import PrivateRoute from './components/PrivateRoute';
+import Home from        './pages/Home';
+import BeerList from    './pages/BeerList';
+import BarList from     './pages/BarList';
+import BarEvents from   './pages/BarEvents';
+import UserSearch from  './pages/UserSearch';
+import Register from    './pages/Register';
+import Login from       './pages/Login';
 import BeerDetails from './pages/BeerDetails';
-import NewReview from './pages/NewReview';
+import NewReview from   './pages/NewReview';
+import BeerReviews from './pages/BeerReviews';
+import EditReview from  './pages/EditReview';
+import PrivateRoute from  './components/PrivateRoute';
+import Header from        './components/Header';
+import Footer from        './components/Footer';
 import ScrollToTop from './services/ScrollToTop';
-import Header from './components/Header';
-import Footer from './components/Footer';
+
 import { Container } from '@mui/material';
 
 const App = () => {
@@ -39,6 +42,8 @@ const App = () => {
               <Route path="/bars/:id/events" element={<BarEvents />} />
               <Route path="/users" element={<UserSearch />} />
               <Route path="/new-review/:id" element={<NewReview />} />
+              <Route path="/beers/:id/reviews" element={<BeerReviews />} />
+              <Route path="/reviews/:id/edit" element={<EditReview />} />
             </Route>
 
           </Routes>

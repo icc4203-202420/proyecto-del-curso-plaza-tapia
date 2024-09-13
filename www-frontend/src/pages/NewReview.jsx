@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { TextField, Button, Container } from '@mui/material';
+import { TextField, Button, Container, Slider, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const NewReview = () => {
-  const { id } = useParams(); // Obtiene el beerId de la URL
+  const { id } = useParams();
   const [text, setText] = useState('');
-  const [rating, setRating] = useState('');
+  const [rating, setRating] = useState(1); // Set initial rating to 1
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -15,33 +15,57 @@ const NewReview = () => {
 
     const token = localStorage.getItem('token');
     const userId = localStorage.getItem('user_id');
+    const beerId = id;
 
     try {
       await axios.post('http://127.0.0.1:3001/api/v1/reviews', {
         review: {
           text,
           rating,
-          user_id: userId,
-          beer_id: id, // Usa el beerId obtenido de useParams
-        }
+          beer_id: beerId
+        },
+        user_id: userId
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-
-      navigate('/reviews'); // Redirige después de la creación exitosa
+      navigate('/beers/' + beerId + '/reviews');
     } catch (err) {
       setError('Error creating review');
       console.error(err);
     }
   };
 
+  const handleRatingChange = (event, newValue) => {
+    setRating(newValue);
+  };
+
   return (
     <Container>
-      <h1>Create Review</h1>
+      <Typography variant="h4" sx={{ color: 'black' }}>Create Review</Typography>
+      <Typography variant="h6" sx={{ color: 'black' }}>Rating</Typography>
       <form onSubmit={handleSubmit}>
+        <Slider
+          label="Rating"
+          value={rating}
+          onChange={handleRatingChange}
+          aria-labelledby="rating-slider"
+          min={1}
+          max={5}
+          step={0.1}
+          marks={[
+            { value: 1, label: '1' },
+            { value: 2, label: '2' },
+            { value: 3, label: '3' },
+            { value: 4, label: '4' },
+            { value: 5, label: '5' },
+          ]}
+          valueLabelDisplay="auto"
+          sx={{ color: 'black' }}
+        />
+        <Typography variant="h6" sx={{ color: 'black' }}>Review Text</Typography>
         <TextField
           label="Review Text"
           variant="outlined"
@@ -49,17 +73,11 @@ const NewReview = () => {
           margin="normal"
           value={text}
           onChange={(e) => setText(e.target.value)}
+          InputProps={{
+            sx: { color: 'black' } // Ensuring the input text is black
+          }}
         />
-        <TextField
-          label="Rating"
-          type="number"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
-        />
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <Typography sx={{ color: 'red' }}>{error}</Typography>}
         <Button type="submit" variant="contained" color="primary">
           Submit Review
         </Button>
