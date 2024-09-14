@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       resources :events do
         member do
           get 'attendances', to: 'attendances#index' # Route to get users attending the event
+          post 'attendances', to: 'attendances#create' # Route to create attendance
         end
       end
 
