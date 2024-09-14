@@ -3,7 +3,7 @@ class API::V1::BeersController < ApplicationController
   include Authenticable
 
   respond_to :json
-  before_action :set_beer, only: [:show, :update, :destroy, :bars]
+  before_action :set_beer, only: [:show, :update, :destroy, :bars, :reviews]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   # GET /beers
@@ -57,6 +57,14 @@ class API::V1::BeersController < ApplicationController
   def bars
     bars = @beer.bars # Assuming Beer has many Bars through a join table
     render json: { bars: bars }, status: :ok
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Beer not found' }, status: :not_found
+  end
+
+  # GET /beers/:id/reviews
+  def reviews
+    reviews = @beer.reviews
+    render json: { reviews: reviews }, status: :ok
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'Beer not found' }, status: :not_found
   end

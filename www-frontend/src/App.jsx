@@ -7,12 +7,15 @@ import BarEvents from './pages/BarEvents';
 import UserSearch from './pages/UserSearch';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import PrivateRoute from './components/PrivateRoute';
 import BeerDetails from './pages/BeerDetails';
 import NewReview from './pages/NewReview';
-import ScrollToTop from './services/ScrollToTop';
+import BeerReviews from './pages/BeerReviews';
+import EditReview from './pages/EditReview';
+import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ScrollToTop from './services/ScrollToTop';
+
 import { Container } from '@mui/material';
 import EventDetails from './pages/EventDetails';
 
@@ -41,6 +44,8 @@ const App = () => {
               <Route path="/users" element={<UserSearch />} />
               <Route path="/new-review/:id" element={<NewReview />} />
               <Route path="/events/:id" element={<EventDetails />} />
+              <Route path="/beers/:id/reviews" element={<BeerReviews />} />
+              <Route path="/reviews/:id/edit" element={<EditReview />} />
             </Route>
 
           </Routes>

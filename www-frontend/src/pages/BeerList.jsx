@@ -75,12 +75,8 @@ const BeersList = () => {
     navigate('/');
   };
 
-  const handleBarsClick = () => {
-    navigate('/');
-  };
-
   const handleBeerClick = (id) => {
-    navigate(`/beers/${id}`); // Navigate to the beer details page
+    navigate(`/beers/${id}`);
   };
 
   const handleSearchChange = (event) => {
@@ -125,7 +121,7 @@ const BeersList = () => {
                 </ListItemAvatar>
                 <ListItemText
                   primary={beer.name}
-                  secondary={`Brewery: ${beer.brewery}`} // Adjust as needed for brewery field
+                  secondary={`Brewery: ${beer.brewery}`}
                   primaryTypographyProps={{ style: { color: 'black' } }}
                 />
               </ListItem>
