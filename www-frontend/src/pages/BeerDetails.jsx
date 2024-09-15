@@ -92,14 +92,7 @@ const BeerDetails = () => {
 
                         {/* Conditional rendering of Create/Edit Review button */}
                         {userReview ? (
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => handleEditReview(userReview.id)}
-                                sx={{ mt: 4 }}
-                            >
-                                Edit Review
-                            </Button>
+                            <></>
                         ) : (
                             <Button
                                 variant="contained"

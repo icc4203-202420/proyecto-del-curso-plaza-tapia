@@ -1,7 +1,6 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useState } from 'react';
 import { Container, List, Typography, CircularProgress, Paper, Card, CardContent, Button } from '@mui/material';
 
 // Reducer function to manage state
@@ -76,17 +75,9 @@ const BeerReviews = () => {
             {userReview && (
               <Card sx={{ marginBottom: 2 }}>
                 <CardContent>
-                  <Typography variant="h5">Your Review</Typography>
+                  <Typography variant="h6">Your Review</Typography>
                   <Typography variant="body2">Rating: {userReview.rating}</Typography>
                   <Typography variant="body2">{userReview.text}</Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleEditReview(userReview.id)}
-                    sx={{ marginTop: 2 }}
-                  >
-                    Edit Review
-                  </Button>
                 </CardContent>
               </Card>
             )}
@@ -105,7 +96,7 @@ const BeerReviews = () => {
               otherReviews.map(review => (
                 <Card key={review.id} sx={{ marginBottom: 2 }}>
                   <CardContent>
-                    <Typography variant="h6">Rating: {review.rating}</Typography>
+                    <Typography variant="body2">Rating: {review.rating}</Typography>
                     <Typography variant="body2">{review.text}</Typography>
                   </CardContent>
                 </Card>
