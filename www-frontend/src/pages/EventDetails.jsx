@@ -8,28 +8,41 @@ const EventDetails = () => {
     const { id } = useParams(); // Get the event ID from the URL
     const [event, setEvent] = useState(null);
     const [attendees, setAttendees] = useState([]); // State for attendees
+    const [friends, setFriends] = useState([]); // State for friends of the current user
     const [checkedIn, setCheckedIn] = useState(false); // State to track if user has checked in
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Fetch event details and attendees
+    const user_id = localStorage.getItem('user_id'); // Assuming you store the user_id in localStorage after login
+
+    // Fetch event details, attendees, and user friends
     useEffect(() => {
-        const fetchEventDetails = async () => {
+        const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
 
-                // Fetch the event details
+                // Fetch event details
                 const eventResponse = await axios.get(`http://127.0.0.1:3001/api/v1/events/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setEvent(eventResponse.data.event);
 
-                // Fetch the attendees for the event
+                // Fetch attendees for the event
                 const attendeesResponse = await axios.get(`http://127.0.0.1:3001/api/v1/events/${id}/attendances`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setAttendees(attendeesResponse.data); // Assuming the response contains an array of users
+
+                // Check if the current user is already in the list of attendees
+                const isUserCheckedIn = attendeesResponse.data.some(attendee => attendee.id === parseInt(user_id));
+                setCheckedIn(isUserCheckedIn);
+
+                // Fetch current user's friends
+                const friendsResponse = await axios.get(`http://127.0.0.1:3001/api/v1/users/${user_id}/friendships`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setFriends(friendsResponse.data); // Assuming the response contains an array of user friends
 
                 setLoading(false);
             } catch (err) {
@@ -38,14 +51,13 @@ const EventDetails = () => {
             }
         };
 
-        fetchEventDetails();
-    }, [id]);
+        fetchData();
+    }, [id, user_id]);
 
     // Handle the check-in functionality
     const handleCheckIn = async () => {
         try {
             const token = localStorage.getItem('token');
-            const user_id = localStorage.getItem('user_id'); // Assuming you store the user_id in localStorage after login
 
             // Send a POST request to check-in the user
             await axios.post(`http://127.0.0.1:3001/api/v1/events/${id}/attendances`,
@@ -55,10 +67,18 @@ const EventDetails = () => {
                 }
             );
             setCheckedIn(true); // Set checkedIn to true once successful
+
+            // Add the current user to the attendees list manually
+            const newUser = { id: parseInt(user_id), first_name: "You", last_name: "", handle: "current_user" }; // Replace with actual user data if available
+            setAttendees(prev => [...prev, newUser]); // Append the user to the attendees list
         } catch (err) {
             setError(err.message); // Handle errors if the request fails
         }
     };
+
+    // Separate attendees into friends and non-friends
+    const friendsAttendees = attendees.filter(attendee => friends.some(friend => friend.id === attendee.id));
+    const nonFriendsAttendees = attendees.filter(attendee => !friendsAttendees.includes(attendee));
 
     if (loading) return <CircularProgress />;
     if (error) return <Typography color="error">{error}</Typography>;
@@ -86,22 +106,28 @@ const EventDetails = () => {
                             <Typography><strong>Description:</strong> {event.description}</Typography>
                             <Typography><strong>Date:</strong> {new Date(event.date).toLocaleDateString()}</Typography>
 
-                            {/* Check-In Button */}
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleCheckIn}
-                                disabled={checkedIn} // Disable the button if already checked in
-                                sx={{ mt: 2 }}
-                            >
-                                {checkedIn ? 'Checked In' : 'Check In'} {/* Change text based on check-in status */}
-                            </Button>
+                            {checkedIn && (
+                                <Typography sx={{ color: 'green', mt: 2 }}>
+                                    You are checked in!
+                                </Typography> // Added message to indicate user is checked in
+                            )}
+
+                            {!checkedIn && (
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleCheckIn}
+                                    sx={{ mt: 2 }}
+                                >
+                                    Check In
+                                </Button>
+                            )}
 
                             {/* List of attendees */}
-                            <Typography variant="h6" sx={{ mt: 2 }}>Attendees</Typography>
+                            <Typography variant="h6" sx={{ mt: 2 }}>Your Friends</Typography>
                             <List>
-                                {attendees.length > 0 ? (
-                                    attendees.map(user => (
+                                {friendsAttendees.length > 0 ? (
+                                    friendsAttendees.map(user => (
                                         <ListItem key={user.id}>
                                             <ListItemText
                                                 primary={`${user.first_name} ${user.last_name}`}
@@ -110,7 +136,23 @@ const EventDetails = () => {
                                         </ListItem>
                                     ))
                                 ) : (
-                                    <Typography>No attendees yet.</Typography>
+                                    <Typography>No friends attending.</Typography>
+                                )}
+                            </List>
+
+                            <Typography variant="h6" sx={{ mt: 2 }}>Other Attendees</Typography>
+                            <List>
+                                {nonFriendsAttendees.length > 0 ? (
+                                    nonFriendsAttendees.map(user => (
+                                        <ListItem key={user.id}>
+                                            <ListItemText
+                                                primary={`${user.first_name} ${user.last_name}`}
+                                                secondary={`Handle: ${user.handle}`}
+                                            />
+                                        </ListItem>
+                                    ))
+                                ) : (
+                                    <Typography>No other attendees.</Typography>
                                 )}
                             </List>
                         </>
