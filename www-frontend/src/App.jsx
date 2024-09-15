@@ -11,6 +11,7 @@ import BeerDetails from './pages/BeerDetails';
 import NewReview from './pages/NewReview';
 import BeerReviews from './pages/BeerReviews';
 import EditReview from './pages/EditReview';
+import MapWithBarsSearch from './pages/Map';
 import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -46,6 +47,7 @@ const App = () => {
               <Route path="/events/:id" element={<EventDetails />} />
               <Route path="/beers/:id/reviews" element={<BeerReviews />} />
               <Route path="/reviews/:id/edit" element={<EditReview />} />
+              <Route path="/map" element={<MapWithBarsSearch />} /> 
             </Route>
 
           </Routes>
