@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import axios from 'axios';
 
-const apiKey = 'AIzaSyDUeMhptEtQgYFHh3H7FyFs0ksbE-UoShs';
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 const containerStyle = {
   width: '100%',
   height: '400px',
 };
-
+console.log('Google Maps API Key:', apiKey);
 const MapWithBarsSearch = () => {
   const [center, setCenter] = useState({ lat: 0, lng: 0 });
   const [bars, setBars] = useState([]);
@@ -41,7 +41,7 @@ const MapWithBarsSearch = () => {
         });
         const fetchedBars = response.data.bars;
         setBars(fetchedBars);
-        setFilteredBars(fetchedBars); // Initialize filtered bars with all bars
+        setFilteredBars(fetchedBars); // Show all bars initially
       } catch (error) {
         console.error('Error fetching bars:', error);
       }
@@ -53,7 +53,7 @@ const MapWithBarsSearch = () => {
   // Filter bars by search term
   useEffect(() => {
     if (searchTerm === '') {
-      setFilteredBars(bars);
+      setFilteredBars(bars); // Show all bars if the search term is empty
     } else {
       const filtered = bars.filter((bar) =>
         bar.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -69,7 +69,7 @@ const MapWithBarsSearch = () => {
   const handleBarSelect = (bar) => {
     setCenter({ lat: bar.latitude, lng: bar.longitude });
     setSearchTerm(bar.name);
-    setFilteredBars([]); // Hide suggestions after selection
+    setFilteredBars([bar]); // Only show the selected bar after selection
 
     if (mapRef.current) {
       mapRef.current.panTo({ lat: bar.latitude, lng: bar.longitude });
@@ -78,7 +78,7 @@ const MapWithBarsSearch = () => {
   };
 
   return (
-    <div>
+    <div style={{ paddingTop: '80px' }}> {/* Added padding to ensure the search bar is not covered by the top bar */}
       <form style={{ marginBottom: '20px' }}>
         <input
           type="text"
@@ -88,7 +88,7 @@ const MapWithBarsSearch = () => {
           style={{ padding: '10px', width: '300px' }}
         />
         {/* Suggestions list */}
-        {filteredBars.length > 0 && searchTerm && (
+        {filteredBars.length > 0 && (
           <ul style={{ border: '1px solid #ccc', maxHeight: '150px', overflowY: 'auto', padding: '10px', listStyle: 'none' }}>
             {filteredBars.map((bar) => (
               <li
