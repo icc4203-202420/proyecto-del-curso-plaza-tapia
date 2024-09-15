@@ -14,6 +14,11 @@ const Header = () => {
         setAccordionOpen(prev => !prev);
     };
 
+    const handleLinkClick = (path) => {
+        navigate(path);
+        setAccordionOpen(false); // Close the accordion after clicking a link
+    };
+
     useEffect(() => {
         const checkToken = () => {
             setIsLoggedIn(getCurrentToken());
@@ -47,25 +52,25 @@ const Header = () => {
                     <Button color="inherit" component={Link} to="/login">Login</Button>
                 )}
             </Toolbar>
-            {isLoggedIn ? (<>
-                {accordionOpen && (
+            {isLoggedIn ? (
+                accordionOpen && (
                     <Accordion expanded={accordionOpen} sx={{ width: '100%' }}>
                         <AccordionDetails>
                             <List>
-                                <ListItem button component={Link} to="/users">
+                                <ListItem button onClick={() => handleLinkClick('/users')}>
                                     <ListItemText primary="Users" />
                                 </ListItem>
-                                <ListItem button component={Link} to="/option1">
-                                    <ListItemText primary="Option 1" />
+                                <ListItem button onClick={() => handleLinkClick('/map')}>
+                                    <ListItemText primary="Map" />
                                 </ListItem>
-                                <ListItem button component={Link} to="/option2">
-                                    <ListItemText primary="Option 2" />
+                                <ListItem button onClick={() => handleLinkClick('/option2')}>
+                                    <ListItemText primary="Settings" />
                                 </ListItem>
                             </List>
                         </AccordionDetails>
                     </Accordion>
-                )}
-            </>) : null}
+                )
+            ) : null}
         </AppBar>
     );
 };
