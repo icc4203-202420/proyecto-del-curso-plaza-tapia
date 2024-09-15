@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import axios from 'axios'; // Para realizar la solicitud a la API de Google Places
+import axios from 'axios';
 
-const apiKey = 'AIzaSyDUeMhptEtQgYFHh3H7FyFs0ksbE-UoShs'
+const apiKey = 'AIzaSyDUeMhptEtQgYFHh3H7FyFs0ksbE-UoShs';
 
 const containerStyle = {
   width: '100%',
@@ -11,11 +11,12 @@ const containerStyle = {
 
 const MapWithBarsSearch = () => {
   const [center, setCenter] = useState({ lat: 0, lng: 0 });
-  const [bars, setBars] = useState([]); // Estado para los bares encontrados
+  const [bars, setBars] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const mapRef = useRef(null); // Referencia al mapa para acceder a sus métodos
+  const [filteredBars, setFilteredBars] = useState([]);
+  const mapRef = useRef(null);
 
-  // Obtener la ubicación del usuario (GPS)
+  // Get user location (GPS) or fallback to default location
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -25,39 +26,60 @@ const MapWithBarsSearch = () => {
         },
         (error) => {
           console.error('Error getting geolocation:', error);
-          setCenter({ lat: -34.6037, lng: -58.3816 }); // Establecer un valor predeterminado (ej. Buenos Aires)
+          setCenter({ lat: -34.6037, lng: -58.3816 }); // Default to Buenos Aires if geolocation fails
         }
       );
     }
+
+    const fetchBars = async () => {
+      try {
+        const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+        const response = await axios.get('http://127.0.0.1:3001/api/v1/bars', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        });
+        const fetchedBars = response.data.bars;
+        setBars(fetchedBars);
+        setFilteredBars(fetchedBars); // Initialize filtered bars with all bars
+      } catch (error) {
+        console.error('Error fetching bars:', error);
+      }
+    };
+
+    fetchBars();
   }, []);
 
-  // Función para buscar bares usando la API de Google Places
-  const searchBars = async () => {
-    const { lat, lng } = center;
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=bar&keyword=${searchTerm}&key=${apiKey}`
+  // Filter bars by search term
+  useEffect(() => {
+    if (searchTerm === '') {
+      setFilteredBars(bars);
+    } else {
+      const filtered = bars.filter((bar) =>
+        bar.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
-
-      setBars(response.data.results); // Actualiza el estado con los bares encontrados
-    } catch (error) {
-      console.error('Error fetching bars:', error);
+      setFilteredBars(filtered);
     }
-  };
+  }, [searchTerm, bars]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
-    searchBars();
+  const handleBarSelect = (bar) => {
+    setCenter({ lat: bar.latitude, lng: bar.longitude });
+    setSearchTerm(bar.name);
+    setFilteredBars([]); // Hide suggestions after selection
+
+    if (mapRef.current) {
+      mapRef.current.panTo({ lat: bar.latitude, lng: bar.longitude });
+      mapRef.current.setZoom(15); // Reset the zoom to 15 when selecting a bar
+    }
   };
 
   return (
     <div>
-      {/* Formulario de búsqueda */}
-      <form onSubmit={handleSearchSubmit} style={{ marginBottom: '20px' }}>
+      <form style={{ marginBottom: '20px' }}>
         <input
           type="text"
           value={searchTerm}
@@ -65,26 +87,43 @@ const MapWithBarsSearch = () => {
           placeholder="Search for bars"
           style={{ padding: '10px', width: '300px' }}
         />
-        <button type="submit" style={{ padding: '10px' }}>Search</button>
+        {/* Suggestions list */}
+        {filteredBars.length > 0 && searchTerm && (
+          <ul style={{ border: '1px solid #ccc', maxHeight: '150px', overflowY: 'auto', padding: '10px', listStyle: 'none' }}>
+            {filteredBars.map((bar) => (
+              <li
+                key={bar.id}
+                onClick={() => handleBarSelect(bar)}
+                style={{ cursor: 'pointer', padding: '5px 0' }}
+              >
+                {bar.name}
+              </li>
+            ))}
+          </ul>
+        )}
       </form>
 
-      {/* Cargar el mapa de Google */}
       <LoadScript googleMapsApiKey={apiKey}>
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={center}
-          zoom={13}
+          center={center} // Ensure the map is centered
+          zoom={13} // Adjust zoom level if necessary
           onLoad={(map) => {
-            mapRef.current = map; // Guarda referencia al mapa
+            mapRef.current = map;
           }}
         >
-          {/* Mostrar los bares como marcadores en el mapa */}
+          {/* Marker for the user's current location */}
+          {center.lat !== 0 && (
+            <Marker position={center} title="You are here" />
+          )}
+
+          {/* Bar markers with correct latitude and longitude */}
           {bars.map((bar, index) => (
             <Marker
               key={index}
               position={{
-                lat: bar.geometry.location.lat,
-                lng: bar.geometry.location.lng,
+                lat: bar.latitude, // Use bar.latitude from your API
+                lng: bar.longitude, // Use bar.longitude from your API
               }}
               title={bar.name}
             />

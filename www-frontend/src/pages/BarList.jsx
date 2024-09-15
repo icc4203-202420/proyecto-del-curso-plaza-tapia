@@ -120,7 +120,7 @@ const BarsList = () => {
 
       <Toolbar />
 
-      <Button variant="text" onClick={handleViewHistory} sx={{ }}>
+      <Button variant="text" onClick={handleViewHistory} sx={{}}>
         View History
       </Button>
       {showHistory && (
@@ -141,11 +141,11 @@ const BarsList = () => {
               </ListItem>
             )}
             <Button variant="text" onClick={() => {
-                setSearchHistory([]);
-                localStorage.removeItem('searchHistory');
-              }}>
-                Clear History
-              </Button>
+              setSearchHistory([]);
+              localStorage.removeItem('searchHistory');
+            }}>
+              Clear History
+            </Button>
           </List>
         </Box>
       )}
