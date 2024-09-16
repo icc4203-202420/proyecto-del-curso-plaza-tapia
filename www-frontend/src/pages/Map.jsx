@@ -9,6 +9,7 @@ const containerStyle = {
   height: '400px',
 };
 console.log('Google Maps API Key:', apiKey);
+
 const MapWithBarsSearch = () => {
   const [center, setCenter] = useState({ lat: 0, lng: 0 });
   const [bars, setBars] = useState([]);
@@ -16,7 +17,6 @@ const MapWithBarsSearch = () => {
   const [filteredBars, setFilteredBars] = useState([]);
   const mapRef = useRef(null);
 
-  // Get user location (GPS) or fallback to default location
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -50,14 +50,24 @@ const MapWithBarsSearch = () => {
     fetchBars();
   }, []);
 
-  // Filter bars by search term
+  // Filter bars by name or address
   useEffect(() => {
     if (searchTerm === '') {
       setFilteredBars(bars); // Show all bars if the search term is empty
     } else {
-      const filtered = bars.filter((bar) =>
-        bar.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const filtered = bars.filter((bar) => {
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        const { address } = bar;
+        return (
+          bar.name.toLowerCase().includes(lowerSearchTerm) ||
+          (address && (
+            address.line1.toLowerCase().includes(lowerSearchTerm) ||
+            address.line2.toLowerCase().includes(lowerSearchTerm) ||
+            address.city.toLowerCase().includes(lowerSearchTerm) ||
+            address.country.name.toLowerCase().includes(lowerSearchTerm) // Filter by country name
+          ))
+        );
+      });
       setFilteredBars(filtered);
     }
   }, [searchTerm, bars]);
@@ -78,13 +88,13 @@ const MapWithBarsSearch = () => {
   };
 
   return (
-    <div style={{ paddingTop: '80px' }}> {/* Added padding to ensure the search bar is not covered by the top bar */}
+    <div style={{ paddingTop: '80px' }}>
       <form style={{ marginBottom: '20px' }}>
         <input
           type="text"
           value={searchTerm}
           onChange={handleSearchChange}
-          placeholder="Search for bars"
+          placeholder="Search for bars or addresses"
           style={{ padding: '10px', width: '300px' }}
         />
         {/* Suggestions list */}
@@ -94,7 +104,7 @@ const MapWithBarsSearch = () => {
               <li
                 key={bar.id}
                 onClick={() => handleBarSelect(bar)}
-                style={{ cursor: 'pointer', padding: '5px 0' }}
+                style={{ cursor: 'pointer', padding: '5px 0', color: 'black' }}
               >
                 {bar.name}
               </li>
