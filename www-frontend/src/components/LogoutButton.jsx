@@ -12,6 +12,7 @@ const LogoutButton = () => {
       await logout();
       console.log('Logout successful');
       navigate('/');
+      window.location.reload();
     } catch (error) {
       console.error('Logout failed', error);
     }

@@ -1,22 +1,12 @@
-import React, { useState } from 'react';
 import { Toolbar, Typography, Container, Grid, Card, CardContent } from '@mui/material';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 
 const Home = () => {
-  const [accordionOpen, setAccordionOpen] = useState(false);
-
-  const handleMenuClick = () => {
-    setAccordionOpen(prev => !prev);
-  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#ffffff' }}>
-      <Header handleMenuClick={handleMenuClick} accordionOpen={accordionOpen} />
 
       <Toolbar />
 
-      {/* Contenido principal */}
       <Container sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 2 }}>
         <Grid container spacing={2} sx={{ flex: 1 }}>
           <Grid item xs={6}>
@@ -64,8 +54,6 @@ const Home = () => {
           </Grid>
         </Grid>
       </Container>
-
-      <Footer />
       
     </div>
   );

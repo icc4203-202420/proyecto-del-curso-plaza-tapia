@@ -48,4 +48,31 @@ if Rails.env.development?
     end
   end
 
+    # Create users with associated addresses
+  users = FactoryBot.create_list(:user, 10) do |user|
+    user.address.update(country: countries.sample)
+  end
+
+  users.each do |user|
+    # Select 2 random users to be friends with the current user (excluding themselves)
+    friends = users.reject { |u| u == user }.sample(2)
+
+    friends.each do |friend|
+      # Check if the friendship already exists
+      unless Friendship.exists?(user: user, friend: friend) || Friendship.exists?(user: friend, friend: user)
+        FactoryBot.create(:friendship, user: user, friend: friend, bar: bars.sample)
+        # Optionally, create the reverse friendship if friendships are not bidirectional by default
+        FactoryBot.create(:friendship, user: friend, friend: user, bar: bars.sample)
+      end
+    end
+  end
+
+  # Ensure every beer has at least 2 reviews
+  Beer.all.each do |beer|
+    # Select 2 random users to write reviews for the current beer
+    users.sample(2).each do |user|
+      FactoryBot.create(:review, beer: beer, user: user)  # beer and user are passed explicitly
+    end
+  end
+
 end
