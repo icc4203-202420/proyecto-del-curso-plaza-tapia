@@ -8,7 +8,6 @@ const containerStyle = {
   width: '100%',
   height: '400px',
 };
-console.log('Google Maps API Key:', apiKey);
 
 const MapWithBarsSearch = () => {
   const [center, setCenter] = useState({ lat: 0, lng: 0 });
@@ -33,15 +32,15 @@ const MapWithBarsSearch = () => {
 
     const fetchBars = async () => {
       try {
-        const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+        const token = localStorage.getItem('token');
         const response = await axios.get('http://127.0.0.1:3001/api/v1/bars', {
           headers: {
-            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+            Authorization: `Bearer ${token}`,
           },
         });
         const fetchedBars = response.data.bars;
         setBars(fetchedBars);
-        setFilteredBars(fetchedBars); // Show all bars initially
+        setFilteredBars(fetchedBars);
       } catch (error) {
         console.error('Error fetching bars:', error);
       }
@@ -50,10 +49,9 @@ const MapWithBarsSearch = () => {
     fetchBars();
   }, []);
 
-  // Filter bars by name or address
   useEffect(() => {
     if (searchTerm === '') {
-      setFilteredBars(bars); // Show all bars if the search term is empty
+      setFilteredBars(bars);
     } else {
       const filtered = bars.filter((bar) => {
         const lowerSearchTerm = searchTerm.toLowerCase();
@@ -64,7 +62,7 @@ const MapWithBarsSearch = () => {
             address.line1.toLowerCase().includes(lowerSearchTerm) ||
             address.line2.toLowerCase().includes(lowerSearchTerm) ||
             address.city.toLowerCase().includes(lowerSearchTerm) ||
-            address.country.name.toLowerCase().includes(lowerSearchTerm) // Filter by country name
+            address.country.name.toLowerCase().includes(lowerSearchTerm)
           ))
         );
       });
@@ -79,25 +77,30 @@ const MapWithBarsSearch = () => {
   const handleBarSelect = (bar) => {
     setCenter({ lat: bar.latitude, lng: bar.longitude });
     setSearchTerm(bar.name);
-    setFilteredBars([bar]); // Only show the selected bar after selection
+    setFilteredBars([bar]);
 
     if (mapRef.current) {
       mapRef.current.panTo({ lat: bar.latitude, lng: bar.longitude });
-      mapRef.current.setZoom(15); // Reset the zoom to 15 when selecting a bar
+      mapRef.current.setZoom(15);
     }
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Evitar que se renderize/recargue la pagina al presionar enter
+
   };
 
   return (
     <div style={{ paddingTop: '80px' }}>
-      <form style={{ marginBottom: '20px' }}>
+      <form style={{ marginBottom: '20px' }} onSubmit={handleSubmit}>
         <input
           type="text"
           value={searchTerm}
           onChange={handleSearchChange}
-          placeholder="Search for bars or addresses"
+          placeholder="Buscar bares o direcciones"
           style={{ padding: '10px', width: '300px' }}
         />
-        {/* Suggestions list */}
         {filteredBars.length > 0 && (
           <ul style={{ border: '1px solid #ccc', maxHeight: '150px', overflowY: 'auto', padding: '10px', listStyle: 'none' }}>
             {filteredBars.map((bar) => (
@@ -116,24 +119,18 @@ const MapWithBarsSearch = () => {
       <LoadScript googleMapsApiKey={apiKey}>
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={center} // Ensure the map is centered
-          zoom={13} // Adjust zoom level if necessary
+          center={center}
+          zoom={13}
           onLoad={(map) => {
             mapRef.current = map;
           }}
         >
-          {/* Marker for the user's current location */}
-          {center.lat !== 0 && (
-            <Marker position={center} title="You are here" />
-          )}
-
-          {/* Bar markers with correct latitude and longitude */}
-          {bars.map((bar, index) => (
+          {filteredBars.map((bar, index) => (
             <Marker
               key={index}
               position={{
-                lat: bar.latitude, // Use bar.latitude from your API
-                lng: bar.longitude, // Use bar.longitude from your API
+                lat: bar.latitude,
+                lng: bar.longitude,
               }}
               title={bar.name}
             />
