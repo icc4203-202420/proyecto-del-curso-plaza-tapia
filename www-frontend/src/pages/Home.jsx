@@ -1,6 +1,13 @@
-import { Toolbar, Typography, Container, Grid, Card, CardContent } from '@mui/material';
+import { Toolbar, Typography, Container, Grid, Card, CardContent, CardActionArea } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  // Function to navigate to the UserList page
+  const goToUserList = () => {
+    navigate('/userlist');
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#ffffff' }}>
@@ -10,13 +17,16 @@ const Home = () => {
       <Container sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: 2 }}>
         <Grid container spacing={2} sx={{ flex: 1 }}>
           <Grid item xs={6}>
+            {/* Make the Friends card clickable */}
             <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="h6">Friends</Typography>
-                <Typography color="textSecondary">
-                  Find your friends’ beers
-                </Typography>
-              </CardContent>
+              <CardActionArea onClick={goToUserList}>
+                <CardContent>
+                  <Typography variant="h6">Users</Typography>
+                  <Typography color="textSecondary">
+                    Find other users and your friends
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
             </Card>
           </Grid>
 
@@ -54,7 +64,7 @@ const Home = () => {
           </Grid>
         </Grid>
       </Container>
-      
+
     </div>
   );
 };

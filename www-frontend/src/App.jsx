@@ -17,6 +17,8 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './services/ScrollToTop';
 import PhotoCapture from './pages/PhotoCapture';
+import UserList from './pages/UserList';
+import UserProfile from './pages/UserProfile';
 
 import { Container } from '@mui/material';
 import EventDetails from './pages/EventDetails';
@@ -50,6 +52,8 @@ const App = () => {
               <Route path="/reviews/:id/edit" element={<EditReview />} />
               <Route path="/map" element={<MapWithBarsSearch />} />
               <Route path="/photo-capture" element={<PhotoCapture />} />
+              <Route path="/userlist" element={<UserList />} />
+              <Route path="/users/:userId" element={<UserProfile />} />
             </Route>
 
           </Routes>
