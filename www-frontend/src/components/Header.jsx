@@ -1,24 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, AccordionDetails, List, ListItem, ListItemText, Accordion } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
-import { getCurrentUser } from '../services/authService';
+import { Link, useNavigate } from 'react-router-dom';
+import { getCurrentToken } from '../services/authService';
 import LogoutButton from './LogoutButton';
 
-const Header = ({ handleMenuClick, accordionOpen }) => {
-    const [currentUser, setCurrentUser] = useState(getCurrentUser());
+const Header = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(getCurrentToken());
+    const [accordionOpen, setAccordionOpen] = useState(false);
+    const navigate = useNavigate();
+
+    const handleMenuClick = () => {
+        setAccordionOpen(prev => !prev);
+    };
+
+    const handleLinkClick = (path) => {
+        navigate(path);
+        setAccordionOpen(false); // Close the accordion after clicking a link
+    };
 
     useEffect(() => {
-        const checkUser = () => {
-            setCurrentUser(getCurrentUser());
+        const checkToken = () => {
+            setIsLoggedIn(getCurrentToken());
         };
 
-        window.addEventListener('storage', checkUser);
+        window.addEventListener('storage', checkToken);
 
         return () => {
-            window.removeEventListener('storage', checkUser);
+            window.removeEventListener('storage', checkToken);
         };
     }, []);
+
+    const handleHomeClick = () => {
+        navigate('/');
+    };
 
     return (
         <AppBar position="fixed" color="default">
@@ -26,32 +41,36 @@ const Header = ({ handleMenuClick, accordionOpen }) => {
                 <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleMenuClick}>
                     <ExpandMore />
                 </IconButton>
-                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-                    BarSocial
-                </Typography>
-                {currentUser ? (
+                <Button color="inherit" onClick={handleHomeClick} sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
+                        BarSocial
+                    </Typography>
+                </Button>
+                {isLoggedIn ? (
                     <LogoutButton />
                 ) : (
                     <Button color="inherit" component={Link} to="/login">Login</Button>
                 )}
             </Toolbar>
-            {accordionOpen && (
-                <Accordion expanded={accordionOpen} sx={{ width: '100%' }}>
-                    <AccordionDetails>
-                        <List>
-                            <ListItem button component={Link} to="/users">
-                                <ListItemText primary="Users" />
-                            </ListItem>
-                            <ListItem button component={Link} to="/option1">
-                                <ListItemText primary="Option 1" />
-                            </ListItem>
-                            <ListItem button component={Link} to="/option2">
-                                <ListItemText primary="Option 2" />
-                            </ListItem>
-                        </List>
-                    </AccordionDetails>
-                </Accordion>
-            )}
+            {isLoggedIn ? (
+                accordionOpen && (
+                    <Accordion expanded={accordionOpen} sx={{ width: '100%' }}>
+                        <AccordionDetails>
+                            <List>
+                                <ListItem button onClick={() => handleLinkClick('/users')}>
+                                    <ListItemText primary="Users" />
+                                </ListItem>
+                                <ListItem button onClick={() => handleLinkClick('/map')}>
+                                    <ListItemText primary="Map" />
+                                </ListItem>
+                                <ListItem button onClick={() => handleLinkClick('/option2')}>
+                                    <ListItemText primary="Settings" />
+                                </ListItem>
+                            </List>
+                        </AccordionDetails>
+                    </Accordion>
+                )
+            ) : null}
         </AppBar>
     );
 };
