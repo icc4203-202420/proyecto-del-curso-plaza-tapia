@@ -7,42 +7,36 @@ import { ArrowBack } from '@mui/icons-material';
 const EventDetails = () => {
     const { id } = useParams(); // Get the event ID from the URL
     const [event, setEvent] = useState(null);
-    const [attendees, setAttendees] = useState([]); // State for attendees
-    const [friends, setFriends] = useState([]); // State for friends of the current user
-    const [checkedIn, setCheckedIn] = useState(false); // State to track if user has checked in
+    const [attendees, setAttendees] = useState([]);
+    const [friends, setFriends] = useState([]);
+    const [checkedIn, setCheckedIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const user_id = localStorage.getItem('user_id'); // Assuming you store the user_id in localStorage after login
+    const user_id = localStorage.getItem('user_id');
 
-    // Fetch event details, attendees, and user friends
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
-
-                // Fetch event details
                 const eventResponse = await axios.get(`http://127.0.0.1:3001/api/v1/events/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setEvent(eventResponse.data.event);
 
-                // Fetch attendees for the event
                 const attendeesResponse = await axios.get(`http://127.0.0.1:3001/api/v1/events/${id}/attendances`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setAttendees(attendeesResponse.data); // Assuming the response contains an array of users
+                setAttendees(attendeesResponse.data);
 
-                // Check if the current user is already in the list of attendees
                 const isUserCheckedIn = attendeesResponse.data.some(attendee => attendee.id === parseInt(user_id));
                 setCheckedIn(isUserCheckedIn);
 
-                // Fetch current user's friends
                 const friendsResponse = await axios.get(`http://127.0.0.1:3001/api/v1/users/${user_id}/friendships`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setFriends(friendsResponse.data); // Assuming the response contains an array of user friends
+                setFriends(friendsResponse.data);
 
                 setLoading(false);
             } catch (err) {
@@ -54,29 +48,23 @@ const EventDetails = () => {
         fetchData();
     }, [id, user_id]);
 
-    // Handle the check-in functionality
     const handleCheckIn = async () => {
         try {
             const token = localStorage.getItem('token');
-
-            // Send a POST request to check-in the user
             await axios.post(`http://127.0.0.1:3001/api/v1/events/${id}/attendances`,
-                { user_id },  // Send user_id in the request body
+                { user_id },
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            setCheckedIn(true); // Set checkedIn to true once successful
-
-            // Add the current user to the attendees list manually
-            const newUser = { id: parseInt(user_id), first_name: "You", last_name: "", handle: "current_user" }; // Replace with actual user data if available
-            setAttendees(prev => [...prev, newUser]); // Append the user to the attendees list
+            setCheckedIn(true);
+            const newUser = { id: parseInt(user_id), first_name: "You", last_name: "", handle: "current_user" };
+            setAttendees(prev => [...prev, newUser]);
         } catch (err) {
-            setError(err.message); // Handle errors if the request fails
+            setError(err.message);
         }
     };
 
-    // Separate attendees into friends and non-friends
     const friendsAttendees = attendees.filter(attendee => friends.some(friend => friend.id === attendee.id));
     const nonFriendsAttendees = attendees.filter(attendee => !friendsAttendees.includes(attendee));
 
@@ -109,7 +97,7 @@ const EventDetails = () => {
                             {checkedIn && (
                                 <Typography sx={{ color: 'green', mt: 2 }}>
                                     You are checked in!
-                                </Typography> // Added message to indicate user is checked in
+                                </Typography>
                             )}
 
                             {!checkedIn && (
@@ -122,6 +110,16 @@ const EventDetails = () => {
                                     Check In
                                 </Button>
                             )}
+
+                            {/* Button to navigate to PhotoCapture */}
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={() => navigate(`/photo-capture/${id}`)} // Navigate to PhotoCapture with event ID
+                                sx={{ mt: 2 }}
+                            >
+                                Capture Photo
+                            </Button>
 
                             {/* List of attendees */}
                             <Typography variant="h6" sx={{ mt: 2 }}>Your Friends</Typography>
