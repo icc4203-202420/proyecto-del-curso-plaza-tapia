@@ -54,6 +54,7 @@ const App = () => {
               <Route path="/photo-capture" element={<PhotoCapture />} />
               <Route path="/userlist" element={<UserList />} />
               <Route path="/users/:userId" element={<UserProfile />} />
+              <Route path="/photo-capture/:id" element={<PhotoCapture />} />
             </Route>
 
           </Routes>

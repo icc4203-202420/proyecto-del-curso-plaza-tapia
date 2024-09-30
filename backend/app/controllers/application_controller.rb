@@ -13,22 +13,24 @@ class ApplicationController < ActionController::API
       token = auth_header.split(' ').last
       begin
         decoded = JWT.decode(token, Rails.application.credentials.secret_key_base)[0]
+        Rails.logger.info "Decoded token: #{decoded.inspect}"
         @current_user = User.find(decoded['user_id'])
         Rails.logger.info "Current user: #{@current_user.inspect}"
       rescue ActiveRecord::RecordNotFound
-        Rails.logger.error "User not found: #{decoded['user_id']}"
-        render json: { errors: 'User not found' }, status: :unauthorized
+        log_and_render_unauthorized("User not found: #{decoded['user_id']}")
       rescue JWT::ExpiredSignature
-        Rails.logger.error "JWT token has expired"
-        render json: { errors: 'Token has expired' }, status: :unauthorized
+        log_and_render_unauthorized("JWT token has expired")
       rescue JWT::DecodeError => e
-        Rails.logger.error "JWT Decode Error\n Message: #{e.message}\n Token: #{token}\n Decoded token: #{decoded}\n Current user: #{@current_user.inspect}"
-        render json: { errors: 'Invalid token' }, status: :unauthorized
+        log_and_render_unauthorized("JWT Decode Error: #{e.message}\nToken: #{token}")
       end
     else
-      Rails.logger.error "Authorization token missing"
-      render json: { errors: 'Authorization token missing' }, status: :unauthorized
+      log_and_render_unauthorized("Authorization token missing")
     end
-  end  
+  end
+
+  def log_and_render_unauthorized(message)
+    Rails.logger.error message
+    render json: { errors: message }, status: :unauthorized
+  end
   
 end

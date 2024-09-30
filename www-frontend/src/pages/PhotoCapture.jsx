@@ -1,94 +1,154 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button, Typography, Container, TextField } from '@mui/material';
 
 const PhotoCapture = () => {
+    const { id } = useParams(); // Obtiene el ID del evento desde la URL
     const [preview, setPreview] = useState(null);
     const [cameraOn, setCameraOn] = useState(false);
+    const [comment, setComment] = useState(''); // Estado para el comentario
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
+    const navigate = useNavigate(); // Para redirigir después de la captura
 
-    // Turn on the camera
-    const startCamera = async () => {
-        setCameraOn(true);
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            if (videoRef.current) {
+    useEffect(() => {
+        // Inicia la cámara si está activada
+        if (cameraOn) {
+            startCamera();
+        } else {
+            stopCamera();
+        }
+    }, [cameraOn]);
+
+    // Función para iniciar la cámara
+    const startCamera = () => {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
                 videoRef.current.srcObject = stream;
-            }
-        } catch (error) {
-            console.error('Error accessing the camera:', error);
+                videoRef.current.play();
+            })
+            .catch(err => console.error("Error accessing the camera: ", err));
+    };
+
+    // Función para detener la cámara
+    const stopCamera = () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+            const tracks = videoRef.current.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+            videoRef.current.srcObject = null;
         }
     };
 
-    // Capture a photo from the video stream
+    // Función para capturar una foto
     const capturePhoto = () => {
-        const canvas = canvasRef.current;
-        const video = videoRef.current;
-        const context = canvas.getContext('2d');
-
-        // Set canvas dimensions to video size
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        // Draw the video frame onto the canvas
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Get the image data from the canvas
-        const imageDataUrl = canvas.toDataURL('image/png');
-        setPreview(imageDataUrl);
+        const context = canvasRef.current.getContext('2d');
+        context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+        const photoURL = canvasRef.current.toDataURL('image/png');
+        setPreview(photoURL);
+        setCameraOn(false); // Apaga la cámara después de capturar la foto
     };
 
+    // Función para subir la foto al servidor
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!preview) return;
-
-        // Convert the base64 image to a Blob
-        const blob = await fetch(preview).then((res) => res.blob());
+    
+        const token = localStorage.getItem('token');
+    
+        const blob = await fetch(preview).then(res => res.blob());
         const formData = new FormData();
-        formData.append('photo', blob, 'photo.png');
-
+        
+        // Anidar los parámetros dentro de "event_picture"
+        formData.append('event_picture[photo]', blob, 'photo.png');
+        formData.append('event_picture[event_id]', id); // Añadir el event ID al formulario
+        formData.append('event_picture[description]', comment); // Añadir el comentario al formulario
+    
         try {
-            const response = await fetch('http://127.0.0.1:3001/api/v1/upload', {
+            const response = await fetch('http://127.0.0.1:3001/api/v1/event_pictures', {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Authorization: `Bearer ${token}`,
                 },
             });
+    
             if (response.ok) {
                 alert('Photo uploaded successfully!');
+                navigate(`/event-details/${id}`); // Redirige a los detalles del evento después de la subida
             } else {
-                alert('Failed to upload photo');
+                const errorData = await response.json();
+                alert('Failed to upload photo: ' + errorData.error);
             }
         } catch (error) {
-            console.error('Error uploading photo:', error);
+            alert('Error uploading photo: ' + error.message);
         }
     };
+    
 
     return (
-        <div>
-            <h2>Capture a Photo</h2>
-            {!cameraOn && (
-                <button onClick={startCamera}>
+        <Container sx={{ mt: 4 }}>
+            <Typography variant="h4" gutterBottom>
+                Capture a Photo for Event {id}
+            </Typography>
+
+            {!cameraOn && !preview && (
+                <Button variant="contained" color="primary" onClick={() => setCameraOn(true)}>
                     Start Camera
-                </button>
+                </Button>
             )}
+
             {cameraOn && (
-                <div>
-                    <video ref={videoRef} autoPlay playsInline style={{ width: '100%' }} />
-                    <button onClick={capturePhoto}>Capture Photo</button>
-                    <canvas ref={canvasRef} style={{ display: 'none' }} />
-                </div>
+                <>
+                    <video ref={videoRef} style={{ width: '100%', maxWidth: '400px' }} />
+                    <Button variant="contained" color="secondary" onClick={capturePhoto} sx={{ mt: 2 }}>
+                        Capture Photo
+                    </Button>
+                </>
             )}
+
             {preview && (
-                <div>
-                    <h3>Preview</h3>
-                    <img src={preview} alt="Captured" style={{ marginTop: '10px', maxHeight: '200px' }} />
-                    <form onSubmit={handleSubmit}>
-                        <button type="submit">Upload Photo</button>
-                    </form>
-                </div>
+                <>
+                    <Typography variant="h6" gutterBottom>
+                        Photo Preview
+                    </Typography>
+                    <img src={preview} alt="Captured" style={{ width: '100%', maxWidth: '400px' }} />
+
+                    <TextField
+                        label="Comment"
+                        variant="outlined"
+                        fullWidth
+                        multiline
+                        rows={3}
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        sx={{ mt: 2 }}
+                    />
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSubmit}
+                        sx={{ mt: 2 }}
+                    >
+                        Upload Photo
+                    </Button>
+
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => {
+                            setPreview(null);
+                            setCameraOn(true); // Reabrir la cámara si se quiere hacer otra captura
+                        }}
+                        sx={{ mt: 2 }}
+                    >
+                        Retake Photo
+                    </Button>
+                </>
             )}
-        </div>
+
+            <canvas ref={canvasRef} style={{ display: 'none' }} width="400" height="300" />
+        </Container>
     );
 };
 

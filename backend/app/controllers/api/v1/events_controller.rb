@@ -18,7 +18,7 @@ class API::V1::EventsController < ApplicationController
         thumbnail_url: url_for(@event.thumbnail)}),
         status: :ok
     else
-      render json: { event: @event.as_json }, status: :ok
+      render json: { event: @event.as_json }, status: :ok     
     end
   end
 

@@ -48,6 +48,8 @@ Rails.application.routes.draw do
 
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
       resources :attendances, only: [:create] # Route for creating attendance
+
+      resources :event_pictures, only: [:create]
     end
   end
 end
