@@ -2,12 +2,16 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
 import React, { useState } from 'react';
 
-const LoginScreen = ({ navigation }) => {
+const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [first_name, setFirstName] = useState('');
+  const [last_name, setLastName] = useState('');
+  const [handle, setHandle] = useState('');
   const [password, setPassword] = useState('');
+  const [password_confirmation, setPasswordConfirmation] = useState('');
 
-  const handleLogin = async () => {
-    const url = 'http://127.0.0.1:3001/api/v1/login';
+  const handleRegister = async () => {
+    const url = 'http://127.0.0.1:3001/api/v1/signup';
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -17,7 +21,11 @@ const LoginScreen = ({ navigation }) => {
         body: JSON.stringify({
           user: {
             email,
+            first_name,
+            last_name,
+            handle,
             password,
+            password_confirmation,
           },
         }),
       });
@@ -28,8 +36,8 @@ const LoginScreen = ({ navigation }) => {
         throw new Error(data.message || 'Ocurrió un error');
       }
 
-      Alert.alert('Inicio de sesión exitoso', data.message);
-      // Aquí puedes manejar el token o redireccionar al usuario a otra pantalla
+      Alert.alert('Registro exitoso', data.message);
+      // Aquí puedes manejar el token o redireccionar al usuario a la pantalla de login
 
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -38,7 +46,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text>Iniciar sesión</Text>
+      <Text>Registrarse</Text>
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico"
@@ -47,15 +55,40 @@ const LoginScreen = ({ navigation }) => {
       />
       <TextInput
         style={styles.input}
+        placeholder="Nombre"
+        value={first_name}
+        onChangeText={setFirstName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Apellido"
+        value={last_name}
+        onChangeText={setLastName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre de usuario"
+        value={handle}
+        onChangeText={setHandle}
+      />
+      <TextInput
+        style={styles.input}
         placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Iniciar sesión" onPress={handleLogin} />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirmación de contraseña"
+        value={password_confirmation}
+        onChangeText={setPasswordConfirmation}
+        secureTextEntry
+      />
+      <Button title="Registrarse" onPress={handleRegister} />
       <Button
-        title="¿No tienes una cuenta? Regístrate"
-        onPress={() => navigation.navigate('Register')}
+        title="¿No tienes una cuenta? Inicia sesión"
+        onPress={() => navigation.navigate('Login')}
       />
       <StatusBar style="auto" />
     </View>
@@ -80,4 +113,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
