@@ -1,27 +1,34 @@
-class ApplicationController < ActionController::API
+require 'json_web_token'
 
-  before_action :configure_permitted_parameters, if: :devise_controller?
-  #before_action :authenticate_user!
+class ApplicationController < ActionController::API
+  before_action :authorize_request
+  attr_reader :current_user
 
   protected
 
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: %i[name avatar])
-    devise_parameter_sanitizer.permit(:account_update, keys: %i[name avatar])
-  end
-
-  rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
-
-  rescue_from JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError, with: :invalid_token_response
-
-  private
-
-  def not_found_response(exception)
-    render json: { error: exception.message }, status: :not_found
-  end
-
-  def invalid_token_response
-    render json: { error: 'Invalid or expired token' }, status: :unauthorized
-  end
-
+  def authorize_request
+    auth_header = request.headers['Authorization']
+    
+    if auth_header.present?
+      token = auth_header.split(' ').last
+      begin
+        decoded = JWT.decode(token, Rails.application.credentials.secret_key_base)[0]
+        @current_user = User.find(decoded['user_id'])
+        Rails.logger.info "Current user: #{@current_user.inspect}"
+      rescue ActiveRecord::RecordNotFound
+        Rails.logger.error "User not found: #{decoded['user_id']}"
+        render json: { errors: 'User not found' }, status: :unauthorized
+      rescue JWT::ExpiredSignature
+        Rails.logger.error "JWT token has expired"
+        render json: { errors: 'Token has expired' }, status: :unauthorized
+      rescue JWT::DecodeError => e
+        Rails.logger.error "JWT Decode Error\n Message: #{e.message}\n Token: #{token}\n Decoded token: #{decoded}\n Current user: #{@current_user.inspect}"
+        render json: { errors: 'Invalid token' }, status: :unauthorized
+      end
+    else
+      Rails.logger.error "Authorization token missing"
+      render json: { errors: 'Authorization token missing' }, status: :unauthorized
+    end
+  end  
+  
 end

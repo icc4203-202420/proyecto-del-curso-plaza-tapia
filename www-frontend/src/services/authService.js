@@ -6,8 +6,23 @@ export const login = async (email, password) => {
   try {
     const response = await axios.post(`${API_URL}/login`, { user: { email, password } });
     if (response.data.token) {
-      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem('token', response.data.token);
     }
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getProtectedResource = async () => {
+  const token = localStorage.getItem('token');
+  console.log('Token:', token);
+  try {
+    const response = await axios.get(`${API_URL}/beers`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -16,26 +31,19 @@ export const login = async (email, password) => {
 
 export const logout = async () => {
   try {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.token) {
-      localStorage.removeItem('user');
+    const token = localStorage.getItem('token');
+    if (token) {
+      console.log('User logged in');
       localStorage.removeItem('token');
+      localStorage.removeItem('user_id');
       return;
     }
-
-    const response = await axios.delete(`${API_URL}/logout`, {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      }
-    });
-
-    localStorage.removeItem('user');
-    return response.data;
+    return;
   } catch (error) {
     throw error;
   }
 };
 
-export const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem('user'));
+export const getCurrentToken = () => {
+  return localStorage.getItem('token');
 };
