@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }) => {
   }, []);
 
   const handleLogin = async () => {
-    const url = 'http://192.168.0.13:3000/api/v1/login';
+    const url = 'http://127.0.0.1:3000/api/v1/login';
     try {
       const response = await fetch(url, {
         method: 'POST',

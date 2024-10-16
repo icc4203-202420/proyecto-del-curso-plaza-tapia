@@ -11,7 +11,7 @@ const SearchBeers = () => {
         // Fetch the list of beers when the component loads
         const fetchBeers = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:3001/api/v1/beers');
+                const response = await axios.get('http://127.0.0.1:3000/api/v1/beers');
                 console.log('API response:', response.data.beers);  // Debugging: log the data to confirm it's coming in
                 setBeers(response.data.beers);
                 setFilteredBeers(response.data.beers);  // Set the initial filtered beers to be all beers
