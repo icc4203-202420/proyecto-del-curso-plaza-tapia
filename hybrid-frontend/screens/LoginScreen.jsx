@@ -31,6 +31,8 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert('Inicio de sesión exitoso', data.message);
       // Aquí puedes manejar el token o redireccionar al usuario a otra pantalla
 
+      navigation.navigate('Home');
+
     } catch (error) {
       Alert.alert('Error', error.message);
     }
