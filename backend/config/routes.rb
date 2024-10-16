@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  # devise_for :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   get 'current_user', to: 'current_user#index'
   devise_for :users, path: '', path_names: {
