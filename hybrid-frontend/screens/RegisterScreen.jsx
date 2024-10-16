@@ -87,7 +87,7 @@ const RegisterScreen = ({ navigation }) => {
       />
       <Button title="Registrarse" onPress={handleRegister} />
       <Button
-        title="¿No tienes una cuenta? Inicia sesión"
+        title="¿Ya tienes una cuenta? Inicia sesión"
         onPress={() => navigation.navigate('Login')}
       />
       <StatusBar style="auto" />
