@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
 import React, { useState } from 'react';
+import Cookies from 'js-cookie';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ const LoginScreen = ({ navigation }) => {
       if (!response.ok) {
         throw new Error(data.message || 'Ocurrió un error');
       }
-
+      Cookies.set('jwt', data.token, { expires: 1, secure: true, sameSite: 'Strict' });
       Alert.alert('Inicio de sesión exitoso', data.message);
       // Aquí puedes manejar el token o redireccionar al usuario a otra pantalla
 
