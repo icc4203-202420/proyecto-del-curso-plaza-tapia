@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
+import { CommonActions } from '@react-navigation/native';
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
 import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importar AsyncStorage
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -11,7 +13,7 @@ const RegisterScreen = ({ navigation }) => {
   const [password_confirmation, setPasswordConfirmation] = useState('');
 
   const handleRegister = async () => {
-    const url = 'http://192.168.0.1:3001/api/v1/signup';
+    const url = 'http://192.168.0.13:3000/api/v1/signup';
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -36,11 +38,41 @@ const RegisterScreen = ({ navigation }) => {
         throw new Error(data.message || 'Ocurrió un error');
       }
 
-      Alert.alert('Registro exitoso', data.message);
-      // Aquí puedes manejar el token o redireccionar al usuario a la pantalla de login
+      // Alert.alert('Registro exitoso', data.message);
+      const loginResponse = await fetch('http://192.168.0.13:3000/api/v1/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user: {
+            email,
+            password,
+          },
+        }),
+      });
+
+      const loginData = await loginResponse.json();
+
+      if (!loginResponse.ok) {
+        throw new Error(loginData.message || 'Error al iniciar sesión después del registro');
+      }
+
+      // Guardar token JWT en AsyncStorage
+      await AsyncStorage.setItem('jwt', loginData.token); // Guardar el token en AsyncStorage
+
+      // Redirigir a Home después del inicio de sesión automático
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Home' }]
+        })
+      );
 
     } catch (error) {
-      Alert.alert('Error', error.message);
+      Alert.alert('Error en el registro', error.message);
+      setPassword('');
+      setPasswordConfirmation('');
     }
   };
 

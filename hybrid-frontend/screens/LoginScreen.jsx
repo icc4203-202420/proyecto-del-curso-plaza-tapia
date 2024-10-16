@@ -2,22 +2,25 @@ import { StatusBar } from 'expo-status-bar';
 import { CommonActions } from '@react-navigation/native';
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    const token = Cookies.get('jwt');
-    if (token) {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'Home' }]
-        })
-      );  
-    }
+    const token = async () => {
+      const token = await AsyncStorage.getItem('jwt');
+      if (token) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Home' }],
+          })
+        );
+      }
+    };
+    token();
   }, []);
 
   const handleLogin = async () => {
@@ -41,16 +44,18 @@ const LoginScreen = ({ navigation }) => {
       if (!response.ok) {
         throw new Error(data.message || 'Ocurrió un error');
       }
-      Cookies.set('jwt', data.token, { expires: 1, secure: true, sameSite: 'Strict' });
-      // Alert.alert('Inicio de sesión exitoso', data.message);
+
+      await AsyncStorage.setItem('jwt', data.token);
+
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: 'Home' }]
+          routes: [{ name: 'Home' }],
         })
       );
     } catch (error) {
       Alert.alert('Error', error.message);
+      setPassword('');
     }
   };
 
