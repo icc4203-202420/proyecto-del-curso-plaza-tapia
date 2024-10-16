@@ -28,9 +28,12 @@ const LoginScreen = ({ navigation }) => {
       if (!response.ok) {
         throw new Error(data.message || 'Ocurrió un error');
       }
+      console.log(data.token);
       Cookies.set('jwt', data.token, { expires: 1, secure: true, sameSite: 'Strict' });
       Alert.alert('Inicio de sesión exitoso', data.message);
       // Aquí puedes manejar el token o redireccionar al usuario a otra pantalla
+
+      navigation.navigate('Home');
 
     } catch (error) {
       Alert.alert('Error', error.message);
