@@ -15,13 +15,12 @@ const BeersList = () => {
     const fetchBeers = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:3001/api/v1/beers');
-        console.log(response.data); // Verifica los datos recibidos
         const beersData = response.data.beers;
         setBeers(beersData);
-  
+
         const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
         setSearchHistory(history);
-  
+
         if (history.length > 0) {
           const filtered = beersData.filter(beer =>
             history.some(term => beer.name.toLowerCase().includes(term.toLowerCase()))
@@ -34,15 +33,14 @@ const BeersList = () => {
         console.error('Error fetching beers:', error);
       }
     };
-  
+
     fetchBeers();
   }, []);
-  
+
 
   useEffect(() => {
     const filterBeers = () => {
       if (searchTerm === '') {
-        // Si no hay término de búsqueda, mostrar basado en historial
         const beersData = [...beers];
         if (searchHistory.length > 0) {
           const filtered = beersData.filter(beer =>
@@ -55,14 +53,12 @@ const BeersList = () => {
           setFilteredBeers(beersData.sort((a, b) => a.name.localeCompare(b.name)));
         }
       } else {
-        // Filtrar cervezas según el término de búsqueda
         const lowercasedTerm = searchTerm.toLowerCase();
         const filtered = beers.filter(beer =>
           beer.name.toLowerCase().includes(lowercasedTerm)
         );
         setFilteredBeers(filtered);
 
-        // Actualizar el historial de búsqueda
         const updatedHistory = Array.from(new Set([searchTerm, ...searchHistory]));
         setSearchHistory(updatedHistory);
         localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
@@ -80,13 +76,16 @@ const BeersList = () => {
     navigate('/');
   };
 
+  const handleBeerClick = (id) => {
+    navigate(`/beers/${id}`); // Navigate to the beer details page
+  };
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: window.innerWidth, minHeight: '100vh', backgroundColor: '#ffffff' }}>
-      {/* Barra de búsqueda superior */}
       <AppBar position="fixed" color="default" sx={{ width: '100%' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="back" onClick={handleBackClick}>
@@ -108,10 +107,8 @@ const BeersList = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Espaciado para evitar que el contenido quede debajo de la AppBar */}
       <Toolbar />
 
-      {/* Contenedor principal */}
       <Button variant="text" sx={{ mt: 1 }}>
         View History
       </Button>
@@ -119,14 +116,14 @@ const BeersList = () => {
         <List>
           {filteredBeers.length > 0 ? (
             filteredBeers.map((beer) => (
-              <ListItem key={beer.id} button>
+              <ListItem key={beer.id} button onClick={() => handleBeerClick(beer.id)}>
                 <ListItemAvatar>
-                  <Avatar>{beer.name[0]}</Avatar> {/* Muestra la primera letra del nombre de la cerveza */}
+                  <Avatar>{beer.name[0]}</Avatar>
                 </ListItemAvatar>
                 <ListItemText
                   primary={beer.name}
-                  secondary={`Brewery: ${beer.brewery}`} // Asegúrate de tener un campo adecuado en tus datos
-                  primaryTypographyProps={{ style: { color: 'black' } }} // Cambia el color del texto principal a negro
+                  secondary={`Brewery: ${beer.brewery}`} // Adjust as needed for brewery field
+                  primaryTypographyProps={{ style: { color: 'black' } }}
                 />
               </ListItem>
             ))
