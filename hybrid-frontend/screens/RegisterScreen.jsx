@@ -11,7 +11,7 @@ const RegisterScreen = ({ navigation }) => {
   const [password_confirmation, setPasswordConfirmation] = useState('');
 
   const handleRegister = async () => {
-    const url = 'http://127.0.0.1:3001/api/v1/signup';
+    const url = 'http://192.168.0.1:3001/api/v1/signup';
     try {
       const response = await fetch(url, {
         method: 'POST',

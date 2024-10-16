@@ -1,14 +1,27 @@
 import { StatusBar } from 'expo-status-bar';
+import { CommonActions } from '@react-navigation/native';
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  useEffect(() => {
+    const token = Cookies.get('jwt');
+    if (token) {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Home' }]
+        })
+      );  
+    }
+  }, []);
+
   const handleLogin = async () => {
-    const url = 'http://127.0.0.1:3001/api/v1/login';
+    const url = 'http://192.168.0.13:3000/api/v1/login';
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -29,9 +42,13 @@ const LoginScreen = ({ navigation }) => {
         throw new Error(data.message || 'Ocurrió un error');
       }
       Cookies.set('jwt', data.token, { expires: 1, secure: true, sameSite: 'Strict' });
-      Alert.alert('Inicio de sesión exitoso', data.message);
-      // Aquí puedes manejar el token o redireccionar al usuario a otra pantalla
-
+      // Alert.alert('Inicio de sesión exitoso', data.message);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Home' }]
+        })
+      );
     } catch (error) {
       Alert.alert('Error', error.message);
     }
