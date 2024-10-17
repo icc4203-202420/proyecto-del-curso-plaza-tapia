@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { CommonActions } from '@react-navigation/native';
+import { API, PORT } from '@env';
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importar AsyncStorage
@@ -13,7 +14,7 @@ const RegisterScreen = ({ navigation }) => {
   const [password_confirmation, setPasswordConfirmation] = useState('');
 
   const handleRegister = async () => {
-    const url = 'http://192.168.0.13:3000/api/v1/signup';
+    const url = `http://${API}:${PORT}/api/v1/signup`;
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -39,7 +40,7 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       // Alert.alert('Registro exitoso', data.message);
-      const loginResponse = await fetch('http://192.168.0.13:3000/api/v1/login', {
+      const loginResponse = await fetch(`http://${API}:${PORT}/api/v1/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

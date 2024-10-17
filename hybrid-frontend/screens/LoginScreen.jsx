@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { CommonActions } from '@react-navigation/native';
+import { API, PORT } from '@env';
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,7 +25,7 @@ const LoginScreen = ({ navigation }) => {
   }, []);
 
   const handleLogin = async () => {
-    const url = 'http://192.168.0.13:3000/api/v1/login';
+    const url = `http://${API}:${PORT}/api/v1/login`;
     try {
       const response = await fetch(url, {
         method: 'POST',

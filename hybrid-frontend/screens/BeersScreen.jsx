@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet } from 'react-native';
+import { API, PORT } from '@env';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
-const SearchBeers = () => {
+const BeersScreen = ({ navigation }) => {
     const [query, setQuery] = useState('');      // For the search input
     const [beers, setBeers] = useState([]);      // Full list of beers from backend
     const [filteredBeers, setFilteredBeers] = useState([]);  // Filtered list of beers
@@ -11,8 +12,7 @@ const SearchBeers = () => {
         // Fetch the list of beers when the component loads
         const fetchBeers = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:3001/api/v1/beers');
-                console.log('API response:', response.data.beers);  // Debugging: log the data to confirm it's coming in
+                const response = await axios.get(`http://${API}:${PORT}/api/v1/beers`);
                 setBeers(response.data.beers);
                 setFilteredBeers(response.data.beers);  // Set the initial filtered beers to be all beers
             } catch (error) {
@@ -58,10 +58,14 @@ const SearchBeers = () => {
                 data={filteredBeers}
                 keyExtractor={(item) => item.id.toString()} // Assuming each beer has a unique 'id'
                 renderItem={({ item }) => (
-                    <View style={styles.beerItem}>
-                        <Text style={styles.beerName}>{item.name}</Text>
-                        <Text>{item.description}</Text>
-                    </View>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Beer', { beerId: item.id })}
+                    >
+                        <View style={styles.beerItem}>
+                            <Text style={styles.beerName}>{item.name}</Text>
+                            <Text>{item.description}</Text>
+                        </View>
+                    </TouchableOpacity>
                 )}
             />
         </View>
@@ -99,4 +103,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SearchBeers;
+export default BeersScreen;

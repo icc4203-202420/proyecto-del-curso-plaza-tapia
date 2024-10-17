@@ -17,7 +17,7 @@ const Navbar = ({ navigation }) => {
   return (
     <View style={styles.navbar}>
       <Text style={styles.title}>Título de la Página</Text>
-      <Button title="Cerrar sesión" onPress={handleLogout} />
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 };

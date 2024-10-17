@@ -1,21 +1,31 @@
 import React from 'react';
-import { View, Text, Button } from 'react-native';
-
+import { View, Button, StyleSheet} from 'react-native';
+import Navbar from '../components/Navbar';
 
 const HomeScreen = ({ navigation }) => {
   return (
-    <View>
-      <Text>Home Screen</Text>
-      <Button
-        title="Ir a Detalles"
-        onPress={() => navigation.navigate('Details')}
-      />
-      <Button
-        title="Buscar Cervezas"
-        onPress={() => navigation.navigate('SearchBeers')}  // Update to navigate to SearchBeers
-      />
+    <View style={styles.container}>
+      <Navbar navigation={navigation} />
+      <View style={styles.content}>
+        <Button
+          title="Search for Beers"
+          onPress={() => navigation.navigate('Beers')}
+        />
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 18,
+  },
+});
 
 export default HomeScreen;
