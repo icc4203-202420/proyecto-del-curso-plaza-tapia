@@ -1,26 +1,16 @@
 class API::V1::SessionsController < Devise::SessionsController
   respond_to :json
   skip_before_action :verify_signed_out_user, only: :destroy
-  before_action :restrict_access_to_post, only: [:create]
-  before_action :restrict_access_to_get, only: [:new]
+  skip_before_action :authorize_request, only: [:create]
 
   private
-
-  def restrict_access_to_get
-    if request.get?
-      head :method_not_allowed
-    end
-  end
-
-  def restrict_access_to_post
-    render json: { error: 'Method not allowed' }, status: :method_not_allowed unless request.post?
-  end
 
   def respond_with(current_user, _opts = {})
     token = current_user.generate_jwt
     render json: {
       status: { code: 200, message: 'Logged in successfully.' },
       token: token,
+      user_id: current_user.id
     }, status: :ok
   end
 
