@@ -1,29 +1,58 @@
-import React, { useEffect, useState } from 'react';
-import { API, PORT } from '@env';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API, PORT } from '@env';
+import React, { useEffect, useState } from 'react';
 
-const BeerScreen = ({ route, navigation }) => {
+const BeerScreen = ({ route }) => {
   const { beerId } = route.params;
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
   const [brewery, setBrewery] = useState(null);
+  const [bars, setBars] = useState([]);
+
 
   useEffect(() => {
     const fetchBeerDetails = async () => {
       try {
-        const response = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}`);
+        const token = await AsyncStorage.getItem('jwt');
+        console.log('Token:', token);
+        const response = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
         const data = await response.json();
         setBeer(data.beer);
+        console.log('Beer:', data);
         if (data.beer.brand_id) {
-          const brandResponse = await fetch(`http://${API}:${PORT}/api/v1/brands/${data.beer.brand_id}`);
+          const brandResponse = await fetch(`http://${API}:${PORT}/api/v1/brands/${data.beer.brand_id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
           const brandData = await brandResponse.json();
           setBrand(brandData.name);
           if (brandData && brandData.brewery_id) {
-            const breweryResponse = await fetch(`http://${API}:${PORT}/api/v1/breweries/${brandData.brewery_id}`);
+            const breweryResponse = await fetch(`http://${API}:${PORT}/api/v1/breweries/${brandData.brewery_id}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            });
             const breweryData = await breweryResponse.json();
             setBrewery(breweryData.name);
           }
         }
+        const barsResponse = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}/bars`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        const barsData = await barsResponse.json();
+        // console.log('barsData', barsData);
+        setBars([...barsData]);
+
       } catch (error) {
         console.error(error);
         console.log('Error fetching beer details:', error);
@@ -54,7 +83,7 @@ const BeerScreen = ({ route, navigation }) => {
       <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
       <View style={styles.detailsContainer}>
         <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>Average Rating:</Text>
+          <Text style={styles.detailTitle}>Average rating:</Text>
           <Text style={styles.detail}>
             {beer.avg_rating ? beer.avg_rating : 'Not rated'}
           </Text>
@@ -92,6 +121,16 @@ const BeerScreen = ({ route, navigation }) => {
           <Text style={styles.detail}>{beer.blg ? beer.blg.slice(0, -3) : 'Not available'}</Text>
         </View>
       </View>
+      <View style={styles.detailsContainer}>
+        <Text style={styles.detailTitle}>Bars serving this beer:</Text>
+        {bars.length > 0 ? (
+          bars.map((bar) => (
+            <Text key={bar.id} style={styles.barDetail}>{bar.name}</Text>
+          ))
+        ) : (
+          <Text style={styles.detail}>No bars available</Text>
+        )}
+      </View>
     </ScrollView>
   );
 };
@@ -128,6 +167,11 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   detail: {
+    fontSize: 18,
+    color: '#777',
+  },
+  barDetail: {
+    marginTop: 10,
     fontSize: 18,
     color: '#777',
   },

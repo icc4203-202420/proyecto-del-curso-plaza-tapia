@@ -19,6 +19,8 @@ class API::V1::ReviewsController < ApplicationController
   def create
     @review = @user.reviews.build(review_params)
     if @review.save
+      beer = @review.beer
+      beer.update_avg_rating
       render json: @review, status: :created, location: api_v1_review_url(@review)
     else
       render json: @review.errors, status: :unprocessable_entity
@@ -46,10 +48,11 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def set_user
-    @user = User.find(params[:user_id]) 
+    @user = current_user
   end
 
   def review_params
-    params.require(:review).permit(:id, :text, :rating, :beer_id)
+    params.require(:review).permit(:text, :rating, :beer_id).merge(user_id: params[:user_id])
   end
-end
+  
+end 

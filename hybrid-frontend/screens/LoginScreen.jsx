@@ -1,9 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
-import { CommonActions } from '@react-navigation/native';
-import { API, PORT } from '@env';
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
-import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API, PORT } from '@env';
+import { CommonActions } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { StatusBar } from 'expo-status-bar';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');

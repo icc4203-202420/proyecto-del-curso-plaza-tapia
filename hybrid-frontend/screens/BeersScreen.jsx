@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { API, PORT } from '@env';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API, PORT } from '@env';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const BeersScreen = ({ navigation }) => {
@@ -10,7 +11,15 @@ const BeersScreen = ({ navigation }) => {
     useEffect(() => {
         const fetchBeers = async () => {
             try {
-                const response = await axios.get(`http://${API}:${PORT}/api/v1/beers`);
+                const token = await AsyncStorage.getItem('jwt');
+                console.log('Token:', token);
+                const response = await axios.get(`http://${API}:${PORT}/api/v1/beers`, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
                 setBeers(response.data.beers);
                 setFilteredBeers(response.data.beers);
             }
