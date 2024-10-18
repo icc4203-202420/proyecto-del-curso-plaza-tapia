@@ -28,7 +28,7 @@ const RegisterScreen = ({ navigation }) => {
             last_name,
             handle,
             password,
-            password_confirmation,
+            password_confirmation
           },
         }),
       });
@@ -48,7 +48,7 @@ const RegisterScreen = ({ navigation }) => {
         body: JSON.stringify({
           user: {
             email,
-            password,
+            password
           },
         }),
       });

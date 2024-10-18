@@ -26,6 +26,8 @@ Rails.application.routes.draw do
         end
       end
       resources :beers
+      resources :brands
+      resources :breweries
       resources :events
       resources :users do
         resources :reviews, only: [:index]
