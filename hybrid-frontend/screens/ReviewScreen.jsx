@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
 import { Slider } from '@rneui/themed';  // Importar Slider desde @rneui/themed
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API, PORT } from '@env';
+import jwt_decode from 'jwt-decode';
 
 const ReviewScreen = ({ route, navigation }) => {
     const { beerId } = route.params;
@@ -16,7 +19,7 @@ const ReviewScreen = ({ route, navigation }) => {
             return;
         }
 
-        const userId = 1; // Cambia esto por el ID del usuario actual
+
         const reviewData = {
             review: {
                 text: reviewText,
@@ -26,10 +29,13 @@ const ReviewScreen = ({ route, navigation }) => {
         };
 
         try {
-            const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${userId}/reviews`, {
+
+            const token = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`http://${API}:${PORT}/api/v1/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(reviewData),
             });
@@ -74,7 +80,7 @@ const ReviewScreen = ({ route, navigation }) => {
                 maximumTrackTintColor="#ccc"  // Color de la pista derecha
                 style={styles.slider}  // Estilo del slider
             />
-            <Text>Rating: {rating.toFixed(1)}</Text>
+
 
             {/* Botón para enviar la reseña */}
             <Button title="Submit Review" onPress={handleSubmitReview} />

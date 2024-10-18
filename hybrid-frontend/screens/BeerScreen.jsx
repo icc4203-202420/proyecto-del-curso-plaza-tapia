@@ -4,6 +4,7 @@ import { API, PORT } from '@env';
 import React, { useEffect, useState } from 'react';
 
 const BeerScreen = ({ route, navigation }) => {
+const BeerScreen = ({ route, navigation }) => {
   const { beerId } = route.params;
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
@@ -51,7 +52,7 @@ const BeerScreen = ({ route, navigation }) => {
         });
         const barsData = await barsResponse.json();
         console.log('barsData', barsData);
-        setBars(barsData);
+        setBars(barsData.bars);
 
       } catch (error) {
         console.error(error);
