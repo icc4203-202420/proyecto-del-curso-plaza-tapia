@@ -74,7 +74,7 @@ const ReviewScreen = ({ route, navigation }) => {
                 maximumTrackTintColor="#ccc"  // Color de la pista derecha
                 style={styles.slider}  // Estilo del slider
             />
-            <Text>Rating: {rating.toFixed(1)}</Text>
+
 
             {/* Botón para enviar la reseña */}
             <Button title="Submit Review" onPress={handleSubmitReview} />
