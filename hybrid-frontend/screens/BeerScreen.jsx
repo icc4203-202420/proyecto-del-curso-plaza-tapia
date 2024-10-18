@@ -9,7 +9,8 @@ const BeerScreen = ({ route, navigation }) => {
   const [brand, setBrand] = useState(null);
   const [brewery, setBrewery] = useState(null);
   const [bars, setBars] = useState([]);
-
+  const [review, setReview] = useState([]);
+  const [userReviewExists, setUserReviewExists] = useState(false);
 
   useEffect(() => {
     const fetchBeerDetails = async () => {
@@ -17,37 +18,36 @@ const BeerScreen = ({ route, navigation }) => {
         const token = await AsyncStorage.getItem('jwt');
         console.log('Token:', token);
         const response = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+          headers: {'Authorization': `Bearer ${token}`}
         });
         const data = await response.json();
         setBeer(data.beer);
         console.log('Beer:', data);
+
+        const reviewResponse = await fetch(`http://${API}:${PORT}/api/v1/reviews?beer_id=${beerId}`, {
+          headers: {'Authorization': `Bearer ${token}`}
+        });
+        const reviewData = await reviewResponse.json();
+        console.log('Review:', reviewData);
+        setReview(reviewData.reviews);
+        setUserReviewExists(reviewData.length > 0);
+
         if (data.beer.brand_id) {
           const brandResponse = await fetch(`http://${API}:${PORT}/api/v1/brands/${data.beer.brand_id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
+            headers: {'Authorization': `Bearer ${token}`}
           });
           const brandData = await brandResponse.json();
           setBrand(brandData.name);
           if (brandData && brandData.brewery_id) {
             const breweryResponse = await fetch(`http://${API}:${PORT}/api/v1/breweries/${brandData.brewery_id}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`,
-              },
+              headers: {'Authorization': `Bearer ${token}`}
             });
             const breweryData = await breweryResponse.json();
             setBrewery(breweryData.name);
           }
         }
         const barsResponse = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}/bars`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+          headers: {'Authorization': `Bearer ${token}`}
         });
         const barsData = await barsResponse.json();
         console.log('barsData', barsData);
@@ -80,7 +80,9 @@ const BeerScreen = ({ route, navigation }) => {
           <Text style={styles.subDetail}>{brand} ({brewery})</Text>
         )}
       </View>
-      <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
+      {!userReviewExists && ( // Mostrar el botón solo si no hay reseña
+        <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
+      )}
       <View style={styles.detailsContainer}>
         <View style={styles.detailsSubContainer}>
           <Text style={styles.detailTitle}>Average rating:</Text>
@@ -90,7 +92,12 @@ const BeerScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.detailsSubContainer}>
           <Text style={styles.detailTitle}>Your rating:</Text>
-          <Text style={styles.detail}>Not rated</Text>
+          {userReviewExists && (
+            <Text style={styles.detail}>{review[1].rating}</Text>
+          )}
+          {!userReviewExists && (
+            <Text style={styles.detail}>Not rated</Text>
+          )}
         </View>
         <View style={styles.detailsSubContainer}>
           <Text style={styles.detailTitle}>Style:</Text>

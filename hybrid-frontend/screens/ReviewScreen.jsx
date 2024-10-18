@@ -3,7 +3,6 @@ import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
 import { Slider } from '@rneui/themed';  // Importar Slider desde @rneui/themed
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
-import jwt_decode from 'jwt-decode';
 
 const ReviewScreen = ({ route, navigation }) => {
     const { beerId } = route.params;
