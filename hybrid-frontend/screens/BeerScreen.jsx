@@ -81,6 +81,9 @@ const BeerScreen = ({ route, navigation }) => {
         )}
       </View>
       <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
+      <View style={styles.centeredContainer}>
+        <Button title="See reviews" onPress={() => navigation.navigate('ReviewsScreen', { beerId })} />
+      </View>
       <View style={styles.detailsContainer}>
         <View style={styles.detailsSubContainer}>
           <Text style={styles.detailTitle}>Average rating:</Text>
@@ -131,6 +134,7 @@ const BeerScreen = ({ route, navigation }) => {
           <Text style={styles.detail}>No bars available</Text>
         )}
       </View>
+
     </ScrollView>
   );
 };
