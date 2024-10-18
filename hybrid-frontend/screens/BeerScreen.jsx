@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
 import React, { useEffect, useState } from 'react';
 
-const BeerScreen = ({ route }) => {
+const BeerScreen = ({ route, navigation }) => {
   const { beerId } = route.params;
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
@@ -50,8 +50,8 @@ const BeerScreen = ({ route }) => {
           },
         });
         const barsData = await barsResponse.json();
-        // console.log('barsData', barsData);
-        setBars([...barsData]);
+        console.log('barsData', barsData);
+        setBars(barsData);
 
       } catch (error) {
         console.error(error);

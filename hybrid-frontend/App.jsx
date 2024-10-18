@@ -1,6 +1,10 @@
-import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CommonActions } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Text, TouchableOpacity } from 'react-native';
+
+
 import RegisterScreen from './screens/RegisterScreen';
 import DetailScreen from './screens/DetailScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -11,19 +15,40 @@ import ReviewScreen from './screens/ReviewScreen';
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
+const App = () => {
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('jwt');
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Login' }]
+      })
+    );
+  };
+
+  const screenOptions = (navigation) => ({
+    headerRight: () => (
+      <TouchableOpacity onPress={() => handleLogout(navigation)} style={{ marginRight: 15}}>
+        <Text style={{ color: '#007BFF', fontSize: 20 }}>Logout</Text>
+      </TouchableOpacity>
+    ),
+  });
 
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Details" component={DetailScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Beers" component={BeersScreen} />
-        <Stack.Screen name="Beer" component={BeerScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="ReviewScreen" component={ReviewScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Home"component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="ReviewScreen" component={ReviewScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Details" component={DetailScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Beers" component={BeersScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Beer" component={BeerScreen} options={({ navigation }) => screenOptions(navigation)} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+export default App;
