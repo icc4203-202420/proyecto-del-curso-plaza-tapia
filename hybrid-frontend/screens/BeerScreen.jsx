@@ -18,37 +18,37 @@ const BeerScreen = ({ route, navigation }) => {
         const token = await AsyncStorage.getItem('jwt');
         // console.log('Token:', token);
         const response = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}`, {
-          headers: {'Authorization': `Bearer ${token}`}
+          headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         setBeer(data.beer);
         // console.log('Beer:', data);
 
         const reviewResponse = await fetch(`http://${API}:${PORT}/api/v1/reviews?beer_id=${beerId}`, {
-          headers: {'Authorization': `Bearer ${token}`}
+          headers: { 'Authorization': `Bearer ${token}` }
         });
         const reviewData = await reviewResponse.json();
         console.log('Review:', reviewData);
         setReview(reviewData.reviews);
-        setUserReviewExists(reviewData.length > 0);
+        setUserReviewExists(reviewData.reviews.length > 0);
         console.log('Review:', userReviewExists);
 
         if (data.beer.brand_id) {
           const brandResponse = await fetch(`http://${API}:${PORT}/api/v1/brands/${data.beer.brand_id}`, {
-            headers: {'Authorization': `Bearer ${token}`}
+            headers: { 'Authorization': `Bearer ${token}` }
           });
           const brandData = await brandResponse.json();
           setBrand(brandData.name);
           if (brandData && brandData.brewery_id) {
             const breweryResponse = await fetch(`http://${API}:${PORT}/api/v1/breweries/${brandData.brewery_id}`, {
-              headers: {'Authorization': `Bearer ${token}`}
+              headers: { 'Authorization': `Bearer ${token}` }
             });
             const breweryData = await breweryResponse.json();
             setBrewery(breweryData.name);
           }
         }
         const barsResponse = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}/bars`, {
-          headers: {'Authorization': `Bearer ${token}`}
+          headers: { 'Authorization': `Bearer ${token}` }
         });
         const barsData = await barsResponse.json();
         // console.log('barsData', barsData);
@@ -81,7 +81,7 @@ const BeerScreen = ({ route, navigation }) => {
           <Text style={styles.subDetail}>{brand} ({brewery})</Text>
         )}
       </View>
-      {!userReviewExists && (  
+      {!userReviewExists && (
         <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
       )}
       <View style={styles.centeredContainer}>
