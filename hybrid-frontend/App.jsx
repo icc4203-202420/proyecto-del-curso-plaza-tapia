@@ -11,6 +11,7 @@ import BeersScreen from './screens/BeersScreen';
 import BeerScreen from './screens/BeerScreen';
 import HomeScreen from './screens/HomeScreen';
 import ReviewScreen from './screens/ReviewScreen';
+import ReviewsScreen from './screens/ReviewsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,7 +29,7 @@ const App = () => {
 
   const screenOptions = (navigation) => ({
     headerRight: () => (
-      <TouchableOpacity onPress={() => handleLogout(navigation)} style={{ marginRight: 15}}>
+      <TouchableOpacity onPress={() => handleLogout(navigation)} style={{ marginRight: 15 }}>
         <Text style={{ color: '#007BFF', fontSize: 20 }}>Logout</Text>
       </TouchableOpacity>
     ),
@@ -39,8 +40,9 @@ const App = () => {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Home"component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Home" component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="ReviewScreen" component={ReviewScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="ReviewsScreen" component={ReviewsScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Details" component={DetailScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Beers" component={BeersScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Beer" component={BeerScreen} options={({ navigation }) => screenOptions(navigation)} />

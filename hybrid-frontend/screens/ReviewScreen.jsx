@@ -22,7 +22,7 @@ const ReviewScreen = ({ route, navigation }) => {
         const reviewData = {
             review: {
                 text: reviewText,
-                rating: rating,
+                rating: parseFloat(rating.toFixed(2)),
                 beer_id: beerId,
             },
         };
