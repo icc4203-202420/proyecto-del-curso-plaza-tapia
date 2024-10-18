@@ -11,20 +11,6 @@ const ReviewScreen = ({ route, navigation }) => {
     // Estados para la reseña y el rating
     const [reviewText, setReviewText] = useState('');
     const [rating, setRating] = useState(1);  // Inicializa el rating en 1
-    const [userId, setUserId] = useState(null);
-
-    useEffect(() => {
-        const fetchUserId = async () => {
-            const token = await AsyncStorage.getItem('jwt');  // Obtenemos el token de AsyncStorage
-            if (token) {
-                const decodedToken = jwt_decode(token);  // Decodificamos el token
-                setUserId(decodedToken.user_id);  // Asumimos que el userId está en 'user_id'
-            }
-        };
-
-        fetchUserId();
-    }, []);
-
 
     // Función para enviar la reseña al backend
     const handleSubmitReview = async () => {
@@ -45,8 +31,7 @@ const ReviewScreen = ({ route, navigation }) => {
         try {
 
             const token = await AsyncStorage.getItem('jwt');
-            console.log('ID:', userId);
-            const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}/reviews`, {
+            const response = await fetch(`http://${API}:${PORT}/api/v1/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
