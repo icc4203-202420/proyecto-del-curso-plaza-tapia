@@ -16,13 +16,13 @@ const BeerScreen = ({ route, navigation }) => {
     const fetchBeerDetails = async () => {
       try {
         const token = await AsyncStorage.getItem('jwt');
-        //console.log('Token:', token);
+        console.log('Token:', token);
         const response = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         setBeer(data.beer);
-        //console.log('Beer:', data);
+        console.log('Beer:', data);
 
         const reviewResponse = await fetch(`http://${API}:${PORT}/api/v1/reviews?beer_id=${beerId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -31,6 +31,7 @@ const BeerScreen = ({ route, navigation }) => {
         console.log('Review:', reviewData);
         setReview(reviewData.reviews);
         setUserReviewExists(reviewData.length > 0);
+        console.log('Review:', userReviewExists);
 
         if (data.beer.brand_id) {
           const brandResponse = await fetch(`http://${API}:${PORT}/api/v1/brands/${data.beer.brand_id}`, {
@@ -50,7 +51,7 @@ const BeerScreen = ({ route, navigation }) => {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const barsData = await barsResponse.json();
-        //console.log('barsData', barsData);
+        console.log('barsData', barsData);
         setBars(barsData.bars);
 
       } catch (error) {
@@ -80,7 +81,9 @@ const BeerScreen = ({ route, navigation }) => {
           <Text style={styles.subDetail}>{brand} ({brewery})</Text>
         )}
       </View>
-      <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
+      {!userReviewExists && (
+        <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
+      )}
       <View style={styles.centeredContainer}>
         <Button title="See reviews" onPress={() => navigation.navigate('ReviewsScreen', { beerId })} />
       </View>
@@ -94,7 +97,7 @@ const BeerScreen = ({ route, navigation }) => {
         <View style={styles.detailsSubContainer}>
           <Text style={styles.detailTitle}>Your rating:</Text>
           {userReviewExists && (
-            <Text style={styles.detail}>{review[1].rating}</Text>
+            <Text style={styles.detail}>{review[0].rating}</Text>
           )}
           {!userReviewExists && (
             <Text style={styles.detail}>Not rated</Text>
