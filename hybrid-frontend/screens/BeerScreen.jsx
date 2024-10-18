@@ -62,9 +62,6 @@ const BeerScreen = ({ route }) => {
     fetchBeerDetails();
   }, [beerId]);
 
-  const handleRateBeer = () => {
-    Alert.alert("Rate Beer", "Feature to rate beer will go here!");
-  };
 
   if (!beer) {
     return (
@@ -83,7 +80,7 @@ const BeerScreen = ({ route }) => {
           <Text style={styles.subDetail}>{brand} ({brewery})</Text>
         )}
       </View>
-      <Button title="Write your review" onPress={handleRateBeer} />
+      <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
       <View style={styles.detailsContainer}>
         <View style={styles.detailsSubContainer}>
           <Text style={styles.detailTitle}>Average rating:</Text>
