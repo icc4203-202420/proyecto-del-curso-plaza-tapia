@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { API, PORT } from '@env';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 
-const BeerScreen = ({ route }) => {
+const BeerScreen = ({ route, navigation }) => {
   const { beerId } = route.params;
   const [beer, setBeer] = useState(null);
 
@@ -18,7 +18,7 @@ const BeerScreen = ({ route }) => {
         console.log('Error fetching beer details:', error);
       }
     };
-  
+
 
     fetchBeerDetails();
   }, [beerId]);
@@ -42,6 +42,10 @@ const BeerScreen = ({ route }) => {
       <Text style={styles.detail}>Alcohol: {beer.alcohol}</Text>
       <Text style={styles.detail}>BLG: {beer.blg ? beer.blg.slice(0, -3) : 'Not available'}</Text>
       <Text style={styles.detail}>Average rating: {beer.avg_rating}</Text>
+      <Button
+        title="Write a Review"  // Texto del botón
+        onPress={() => navigation.navigate('ReviewScreen', { beerId: beerId })}  // Navegación a 'ReviewScreen' pasando 'beerId' como parámetro
+      />
     </View>
   );
 };
