@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
 import { Slider } from '@rneui/themed';  // Importar Slider desde @rneui/themed
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API, PORT } from '@env';
+import jwt_decode from 'jwt-decode';
 
 const ReviewScreen = ({ route, navigation }) => {
     const { beerId } = route.params;
@@ -8,6 +11,20 @@ const ReviewScreen = ({ route, navigation }) => {
     // Estados para la reseña y el rating
     const [reviewText, setReviewText] = useState('');
     const [rating, setRating] = useState(1);  // Inicializa el rating en 1
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        const fetchUserId = async () => {
+            const token = await AsyncStorage.getItem('jwt');  // Obtenemos el token de AsyncStorage
+            if (token) {
+                const decodedToken = jwt_decode(token);  // Decodificamos el token
+                setUserId(decodedToken.user_id);  // Asumimos que el userId está en 'user_id'
+            }
+        };
+
+        fetchUserId();
+    }, []);
+
 
     // Función para enviar la reseña al backend
     const handleSubmitReview = async () => {
@@ -16,7 +33,7 @@ const ReviewScreen = ({ route, navigation }) => {
             return;
         }
 
-        const userId = 1; // Cambia esto por el ID del usuario actual
+
         const reviewData = {
             review: {
                 text: reviewText,
@@ -26,10 +43,14 @@ const ReviewScreen = ({ route, navigation }) => {
         };
 
         try {
-            const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${userId}/reviews`, {
+
+            const token = await AsyncStorage.getItem('jwt');
+            console.log('ID:', userId);
+            const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(reviewData),
             });

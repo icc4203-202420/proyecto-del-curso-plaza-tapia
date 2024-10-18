@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
 import React, { useEffect, useState } from 'react';
 
-const BeerScreen = ({ route }) => {
+const BeerScreen = ({ route, navigation }) => {
   const { beerId } = route.params;
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
