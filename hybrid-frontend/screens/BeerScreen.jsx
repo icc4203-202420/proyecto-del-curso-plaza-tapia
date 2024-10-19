@@ -16,26 +16,19 @@ const BeerScreen = ({ route, navigation }) => {
     const fetchBeerDetails = async () => {
       try {
         const token = await AsyncStorage.getItem('jwt');
-        // console.log('Token:', token);
         const response = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         setBeer(data.beer);
-        // console.log('Beer:', data);
-
 
         const reviewResponse = await fetch(`http://${API}:${PORT}/api/v1/reviews`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const reviewData = await reviewResponse.json();
-        console.log('Review:', reviewData);
         const filteredReviews = reviewData.reviews.filter((review) => review.beer_id === beerId);
         setReview(filteredReviews);
         setUserReviewExists(filteredReviews.length > 0);
-        console.log('Review:', userReviewExists);
-        console.log('filteredReviews:', filteredReviews);
-        console.log('Review:', review[0]);
 
         if (data.beer.brand_id) {
           const brandResponse = await fetch(`http://${API}:${PORT}/api/v1/brands/${data.beer.brand_id}`, {
@@ -43,6 +36,7 @@ const BeerScreen = ({ route, navigation }) => {
           });
           const brandData = await brandResponse.json();
           setBrand(brandData.name);
+
           if (brandData && brandData.brewery_id) {
             const breweryResponse = await fetch(`http://${API}:${PORT}/api/v1/breweries/${brandData.brewery_id}`, {
               headers: { 'Authorization': `Bearer ${token}` }
@@ -51,21 +45,20 @@ const BeerScreen = ({ route, navigation }) => {
             setBrewery(breweryData.name);
           }
         }
+
         const barsResponse = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}/bars`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const barsData = await barsResponse.json();
-        // console.log('barsData', barsData);
         setBars(barsData.bars);
 
       } catch (error) {
-        console.error(error);
-        console.log('Error fetching beer details:', error);
+        console.error('Error fetching beer details:', error);
       }
     };
 
     fetchBeerDetails();
-  }, [beerId]);
+  }, [beerId]); // Cada vez que cambia beerId, se vuelve a cargar
 
 
   if (!beer) {
@@ -136,6 +129,14 @@ const BeerScreen = ({ route, navigation }) => {
           <Text style={styles.detail}>{beer.blg ? beer.blg.slice(0, -3) : 'Not available'}</Text>
         </View>
       </View>
+
+      {userReviewExists && (
+        <View style={styles.card}>
+          <Text style={styles.detailTitle}>Your review</Text>
+          <Text style={styles.detail}>Rating: {review[0]?.rating}</Text>
+          <Text style={styles.detail}>{review[0]?.text}</Text>
+        </View>
+      )}
       <View style={styles.detailsContainer}>
         <Text style={styles.detailTitle}>Bars serving this beer:</Text>
         {bars.length > 0 ? (
@@ -146,6 +147,7 @@ const BeerScreen = ({ route, navigation }) => {
           <Text style={styles.detail}>No bars available</Text>
         )}
       </View>
+
 
     </ScrollView>
   );
@@ -207,6 +209,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#555',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
 });
 

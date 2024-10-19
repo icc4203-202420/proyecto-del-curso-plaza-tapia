@@ -44,7 +44,7 @@ const ReviewScreen = ({ route, navigation }) => {
             if (response.ok) {
                 Alert.alert('Success', 'Review submitted successfully');
                 // Navega de vuelta a otra pantalla si es necesario
-                navigation.goBack();
+                navigation.goBack({ refresh: true });
             } else {
                 Alert.alert('Error', `Failed to submit review: ${result.message || 'Unknown error'}`);
             }
