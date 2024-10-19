@@ -24,14 +24,18 @@ const BeerScreen = ({ route, navigation }) => {
         setBeer(data.beer);
         // console.log('Beer:', data);
 
-        const reviewResponse = await fetch(`http://${API}:${PORT}/api/v1/reviews?beer_id=${beerId}`, {
+
+        const reviewResponse = await fetch(`http://${API}:${PORT}/api/v1/reviews`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const reviewData = await reviewResponse.json();
         console.log('Review:', reviewData);
-        setReview(reviewData.reviews);
-        setUserReviewExists(reviewData.reviews.length > 0);
+        const filteredReviews = reviewData.reviews.filter((review) => review.beer_id === beerId);
+        setReview(filteredReviews);
+        setUserReviewExists(filteredReviews.length > 0);
         console.log('Review:', userReviewExists);
+        console.log('filteredReviews:', filteredReviews);
+        console.log('Review:', review[0]);
 
         if (data.beer.brand_id) {
           const brandResponse = await fetch(`http://${API}:${PORT}/api/v1/brands/${data.beer.brand_id}`, {

@@ -31,13 +31,15 @@ const BeersScreen = ({ navigation }) => {
         console.log('Search input:', text);
         setQuery(text);
 
-        if (text === '') { setFilteredBeers(beers); } 
+        if (text === '') { setFilteredBeers(beers); }
         else {
             const filtered = beers.filter((beer) => beer.name.toLowerCase().includes(text.toLowerCase()));
             console.log('Filtered beers:', filtered);
             setFilteredBeers(filtered);
         }
     };
+
+
 
     return (
         <View style={styles.container}>
