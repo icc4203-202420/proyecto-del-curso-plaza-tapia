@@ -2,6 +2,8 @@ class API::V1::RegistrationsController < Devise::RegistrationsController
   include ::RackSessionsFix
   respond_to :json
 
+  skip_before_action :authorize_request, only: [:create]
+
   private
 
   def sign_up_params

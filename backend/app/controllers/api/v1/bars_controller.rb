@@ -7,8 +7,8 @@ class API::V1::BarsController < ApplicationController
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   def index
-    @bars = Bar.all
-    render json: { bars: @bars }, status: :ok
+    @bars = Bar.includes(address: :country).all
+    render json: { bars: @bars.as_json(include: { address: { include: :country } }) }, status: :ok
   end
 
   def show
@@ -54,7 +54,7 @@ class API::V1::BarsController < ApplicationController
 
   def events
     events = @bar.events
-    render json: { events: events }, status: :ok
+    render json: { events: events, bar: @bar.name }, status: :ok
   end
 
   private
