@@ -3,6 +3,7 @@ import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
 import { Slider } from '@rneui/themed';  // Importar Slider desde @rneui/themed
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
+import { Keyboard } from 'react-native';
 
 const ReviewScreen = ({ route, navigation }) => {
     const { beerId } = route.params;
@@ -65,6 +66,8 @@ const ReviewScreen = ({ route, navigation }) => {
                 value={reviewText}
                 onChangeText={setReviewText}
                 multiline
+                onSubmitEditing={() => Keyboard.dismiss()}
+                blurOnSubmit={true}
             />
 
             {/* Slider para el rating */}
