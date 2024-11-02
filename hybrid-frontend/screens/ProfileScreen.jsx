@@ -4,8 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
 import { API, PORT } from '@env';
-
-const jwt = require('jsonwebtoken');
+import { jwtDecode } from "jwt-decode";
 
 const initialState = {
     loading: true,
@@ -36,15 +35,16 @@ const ProfileScreen = () => {
 
             try {
                 const token = await AsyncStorage.getItem('jwt');
-                const decodedToken = jwt.decode(token);
-                const userId = decodedToken.userId;
+                const decodedToken = jwtDecode(token);
                 console.log('Decoded Token:', decodedToken);
-                const response = await fetch(`http://${API}:${PORT}/api/v1/users${userId}`, {
+                const userId = decodedToken.user_id;
+                const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 });
+
                 const data = await response.json();
 
                 console.log('Response:', data);
@@ -52,7 +52,7 @@ const ProfileScreen = () => {
                 dispatch({ type: 'FETCH_SUCCESS', payload: data.user });
 
             } catch (error) {
-                dispatch({ type: 'FETCH_FAILURE', payload: 'Failed to load user details (2)' });
+                dispatch({ type: 'FETCH_FAILURE', payload: 'Failed to load user details' });
             }
         };
 
@@ -111,11 +111,10 @@ const ProfileScreen = () => {
                     <Text style={styles.infoText}>Name: {user.first_name} {user.last_name}</Text>
                     <Text style={styles.infoText}>Email: {user.email}</Text>
                     <Text style={styles.infoText}>Age: {user.age}</Text>
-                    <Text style={styles.infoText}>Address: {user.address.line1}, {user.address.city}, {user.address.country}</Text>
+                    {/* <Text style={styles.infoText}>Address: {user.address.line1}, {user.address.city}, {user.address.country}</Text> */}
                 </>
             )}
 
-            {/* Botón de logout */}
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Text style={styles.logoutButtonText}>Logout</Text>
             </TouchableOpacity>
