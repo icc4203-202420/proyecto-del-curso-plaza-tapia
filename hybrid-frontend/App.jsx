@@ -30,7 +30,7 @@ const App = () => {
   const screenOptions = (navigation) => ({
     headerRight: () => (
       <TouchableOpacity onPress={() => handleLogout(navigation)} style={{ marginRight: 15 }}>
-        <Text style={{ color: '#007BFF', fontSize: 20 }}>Logout</Text>
+        <Text style={{ color: '#007BFF' }}>Logout</Text>
       </TouchableOpacity>
     ),
   });
@@ -41,8 +41,8 @@ const App = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Home" component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="ReviewScreen" component={ReviewScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="ReviewsScreen" component={ReviewsScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Review" component={ReviewScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Reviews" component={ReviewsScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Details" component={DetailScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Beers" component={BeersScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Beer" component={BeerScreen} options={({ navigation }) => screenOptions(navigation)} />

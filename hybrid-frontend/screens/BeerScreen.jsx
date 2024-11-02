@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API, PORT } from '@env';
 import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { API, PORT } from '@env';
 
 const BeerScreen = ({ route, navigation }) => {
   const { beerId } = route.params;
@@ -57,7 +58,12 @@ const BeerScreen = ({ route, navigation }) => {
       }
     };
 
-    fetchBeerDetails();
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchBeerDetails();
+    });
+  
+    // Limpia el listener al desmontar el componente
+    return unsubscribe;
   }, [beerId]); // Cada vez que cambia beerId, se vuelve a cargar
 
 
@@ -79,10 +85,10 @@ const BeerScreen = ({ route, navigation }) => {
         )}
       </View>
       {!userReviewExists && (
-        <Button title="Write your review" onPress={() => navigation.navigate('ReviewScreen', { beerId })} />
+        <Button title="Write your review" onPress={() => navigation.navigate('Review', { beerId })} />
       )}
       <View style={styles.centeredContainer}>
-        <Button title="See reviews" onPress={() => navigation.navigate('ReviewsScreen', { beerId })} />
+        <Button title="See reviews" onPress={() => navigation.navigate('Reviews', { beerId })} />
       </View>
       <View style={styles.detailsContainer}>
         <View style={styles.detailsSubContainer}>

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
-import { Slider } from '@rneui/themed';  // Importar Slider desde @rneui/themed
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API, PORT } from '@env';
+import React, { useState } from 'react';
+import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
 import { Keyboard } from 'react-native';
+import { Slider } from '@rneui/themed';
+import { API, PORT } from '@env';
 
 const ReviewScreen = ({ route, navigation }) => {
     const { beerId } = route.params;
@@ -18,7 +18,6 @@ const ReviewScreen = ({ route, navigation }) => {
             Alert.alert('Error', 'The review must be at least 15 characters long.');
             return;
         }
-
 
         const reviewData = {
             review: {
