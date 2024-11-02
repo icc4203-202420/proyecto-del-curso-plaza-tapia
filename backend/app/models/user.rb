@@ -21,6 +21,12 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :reviews, allow_destroy: true
   accepts_nested_attributes_for :address, allow_destroy: true
 
+  # Solicitudes de amistad enviadas por el usuario
+  has_many :sent_friendship_requests, class_name: 'FriendshipRequest', foreign_key: 'sender_id'
+  has_many :received_friendship_requests, class_name: 'FriendshipRequest', foreign_key: 'receiver_id'
+  has_many :pending_friends, through: :sent_friendship_requests, source: :receiver
+  has_many :pending_friend_requests, through: :received_friendship_requests, source: :sender
+
   # Amistades iniciadas por el usuario
   has_many :friendships
   has_many :friends, through: :friendships, source: :friend

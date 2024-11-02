@@ -42,13 +42,13 @@ class API::V1::ReviewsController < ApplicationController
 
   private
 
+  def set_user
+    @user = current_user
+  end
+
   def set_review
     @review = Review.find_by(id: params[:id])
     render json: { error: "Review not found" }, status: :not_found unless @review
-  end
-
-  def set_user
-    @user = current_user
   end
 
   def review_params

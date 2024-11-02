@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 import { API, PORT } from '@env';
 
 const BeerScreen = ({ route, navigation }) => {
