@@ -10,13 +10,12 @@ class API::V1::AttendancesController < ApplicationController
     end
 
     def create
-      user_id = params[:user_id]
-      attendance = @event.attendances.new(user_id: user_id, checked_in: true)
-      
+      attendance = @event.attendances.new(user_id: @current_user.id, checked_in: true)
+    
       if attendance.save
         render json: { message: 'Successfully checked in.' }, status: :created
       else
-        render json: { error: 'Could not check in.' }, status: :unprocessable_entity
+        render json: { error: 'Could not check in.', details: attendance.errors.full_messages }, status: :unprocessable_entity
       end
     end
     

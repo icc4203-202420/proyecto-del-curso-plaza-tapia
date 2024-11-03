@@ -1,25 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Button, Alert, FlatList } from 'react-native';
 import { API, PORT } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BarDetailsScreen = ({ route }) => {
-  const { barId } = route.params; // ID del evento asociado al bar
+  const { barId } = route.params;
   const [bar, setBar] = useState(null);
+  const [events, setEvents] = useState([]); // Estado para los eventos
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBarDetails = async () => {
       try {
         const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${API}:${PORT}/api/v1/bars/${barId}`, {
+
+        // Obtener detalles del bar
+        const barResponse = await fetch(`http://${API}:${PORT}/api/v1/bars/${barId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
-        const data = await response.json();
-        setBar(data.bar);
-        console.log(data.bar);
+        const barData = await barResponse.json();
+        setBar(barData.bar);
+
+        // Obtener eventos asociados al bar
+        const eventsResponse = await fetch(`http://${API}:${PORT}/api/v1/bars/${barId}/events`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const eventsData = await eventsResponse.json();
+        setEvents(eventsData.events); // Guardar eventos en el estado
+
       } catch (error) {
-        console.error('Error fetching bar details:', error);
+        console.error('Error fetching bar or events details:', error);
       } finally {
         setLoading(false);
       }
@@ -28,22 +38,22 @@ const BarDetailsScreen = ({ route }) => {
     fetchBarDetails();
   }, [barId]);
 
-  const handleCheckIn = async () => {
+  const handleCheckIn = async (eventId) => {
     try {
       const token = await AsyncStorage.getItem('jwt');
-
-      const response = await fetch(`http://${API}:${PORT}/api/v1/events/${barId}/attendances`, {
+      
+      // Realiza la solicitud de check-in directamente
+      const response = await fetch(`http://${API}:${PORT}/api/v1/events/${eventId}/attendances`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          user_id: 71, // Agrega aquí el ID de usuario de prueba o extrae del token como antes
-          checked_in: true,
+          checked_in: true,  // Envia solo el estado de check-in
         }),
       });
-
+  
       if (response.ok) {
         Alert.alert("Success", "Check-in successful!");
       } else {
@@ -79,8 +89,19 @@ const BarDetailsScreen = ({ route }) => {
       <Text style={styles.detail}>Phone: {bar.phone}</Text>
       <Text style={styles.detail}>Rating: {bar.rating ? bar.rating : 'Not rated'}</Text>
 
-      {/* Botón de check-in */}
-      <Button title="Check-in" onPress={handleCheckIn} />
+      {/* Lista de eventos asociados al bar */}
+      <Text style={styles.sectionTitle}>Events at {bar.name}:</Text>
+      <FlatList
+        data={events}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.eventContainer}>
+            <Text style={styles.eventTitle}>{item.name}</Text>
+            <Text style={styles.eventDetail}>Date: {item.date}</Text>
+            <Button title="Check-in" onPress={() => handleCheckIn(item.id)} />
+          </View>
+        )}
+      />
     </View>
   );
 };
@@ -109,6 +130,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#333',
     marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginVertical: 15,
+  },
+  eventContainer: {
+    padding: 15,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  eventTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  eventDetail: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 8,
   },
 });
 
