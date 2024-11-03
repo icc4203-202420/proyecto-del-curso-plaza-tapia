@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, Button, Alert, FlatList } fr
 import { API, PORT } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BarDetailsScreen = ({ route }) => {
+const BarScreen = ({ route }) => {
   const { barId } = route.params;
   const [bar, setBar] = useState(null);
   const [events, setEvents] = useState([]); // Estado para los eventos
@@ -157,4 +157,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BarDetailsScreen;
+export default BarScreen;

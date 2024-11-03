@@ -36,7 +36,7 @@ const ProfileScreen = () => {
             try {
                 const token = await AsyncStorage.getItem('jwt');
                 const decodedToken = jwtDecode(token);
-                console.log('Decoded Token:', decodedToken);
+                // console.log('Decoded Token:', decodedToken);
                 const userId = decodedToken.user_id;
                 const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}`, {
                     headers: {

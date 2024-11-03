@@ -45,14 +45,16 @@ Rails.application.routes.draw do
       resources :users do
         resources :reviews
         member do
-          get :friendships
-          post :friendships, to: 'users#create_friendship'
+          get 'friendships', to: 'users#friendships'
+          post 'friendships', to: 'users#create_friendship'
+          get 'friendship_requests', to: 'friendship_requests#index'
         end
+        resources :friendship_requests, only: [:index, :create]
       end
 
       resources :friendship_requests do
-        post :receiver_id, to: 'friendship_requests#create', on: :collection
-      end
+        post ':user_id', to: 'friendship_requests#create', on: :collection
+      end      
 
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
       resources :attendances, only: [:create] # Route for creating attendance

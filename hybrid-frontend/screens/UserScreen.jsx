@@ -51,7 +51,27 @@ const UserScreen = ({ route }) => {
             }
         };
 
+        const checkFriendRequest = async () => {
+            try {
+                const token = await AsyncStorage.getItem('jwt');
+                const response = await fetch(`http://${API}:${PORT}/api/v1/friendship_requests/show?receiver_id=${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
+
+                if (response.ok && data.request_exists) {
+                    setFriendRequestSent(true); // Indicar que ya existe una solicitud de amistad
+                }
+            } catch (error) {
+                console.error('Error checking friend request:', error);
+            }
+        };
+
         fetchUserDetails();
+        checkFriendRequest();
 
         return () => dispatch({ type: 'FETCH_INIT' });
     }, [userId]);
@@ -65,11 +85,11 @@ const UserScreen = ({ route }) => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ recipientId: userId }), // Asegúrate de que esto coincida con tu API
+                body: JSON.stringify({ friendship_request: { receiver_id: userId } }),
             });
 
             if (response.ok) {
-                Alert.alert('Success', 'Friend request sent successfully');
+                // Alert.alert('Success', 'Friend request sent successfully');
                 setFriendRequestSent(true); // Cambiar el estado para reflejar que se envió la solicitud
             } else {
                 Alert.alert('Error', 'Failed to send friend request');

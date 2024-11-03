@@ -5,11 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 
+import FriendshipRequestsScreen from './screens/FriendshipRequestsScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import ReviewsScreen from './screens/ReviewsScreen';
+import FriendsScreen from './screens/FriendsScreen';
 import ReviewScreen from './screens/ReviewScreen';
-import DetailScreen from './screens/DetailScreen';
+// import FriendScreen from './screens/FriendScreen';
+import DetailsScreen from './screens/DetailsScreen';
 import LoginScreen from './screens/LoginScreen';
 import BeersScreen from './screens/BeersScreen';
 import UsersScreen from './screens/UsersScreen';
@@ -17,7 +20,7 @@ import UserScreen from './screens/UserScreen';
 import BeerScreen from './screens/BeerScreen';
 import HomeScreen from './screens/HomeScreen';
 import BarsScreen from './screens/BarsScreen';          // Nueva pantalla de lista de bares
-import BarDetailsScreen from './screens/BarDetailsScreen';
+import BarScreen from './screens/BarScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,18 +48,21 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name='FriendshipRequests' component={FriendshipRequestsScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Register" component={RegisterScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Profile" component={ProfileScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Details" component={DetailsScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Reviews" component={ReviewsScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Details" component={DetailScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Friends" component={FriendsScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Review" component={ReviewScreen} options={({ navigation }) => screenOptions(navigation)} />
+        {/* <Stack.Screen name='Friend' component={FriendScreen} options={({ navigation }) => screenOptions(navigation)} /> */}
         <Stack.Screen name="Beers" component={BeersScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Users" component={UsersScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="User" component={UserScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Beer" component={BeerScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Bars" component={BarsScreen} options={({ navigation }) => screenOptions(navigation)} /> 
-        <Stack.Screen name="BarDetails" component={BarDetailsScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Home" component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Bar" component={BarScreen} options={({ navigation }) => screenOptions(navigation)} />
       </Stack.Navigator>
     </NavigationContainer>
   );

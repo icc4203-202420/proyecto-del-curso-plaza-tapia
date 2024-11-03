@@ -1,20 +1,32 @@
 class API::V1::FriendshipRequestsController < ApplicationController
 
   before_action :set_friendship_request, only: [:accept, :reject]
-  before_action :set_user, only: [:create, :accept, :reject]
+  before_action :set_user, only: [:index, :show, :create, :accept, :reject]
 
   def index
+    requests = @user.friendship_requests
+    render json: { friendship_requests: requests }, status: :ok
   end
 
   def show
+    receiver_id = params[:receiver_id].to_i
+    @friendship_request = FriendshipRequest.find_by(sender_id: @user.id, receiver_id: receiver_id)
+    if @friendship_request
+      render json: {request_exists: true, friendship_request: @friendship_request}, status: :ok
+    else
+      render json: {request_exists: false}, status: :ok
+    end
   end
 
   # POST /friendship_requests
   def create
     Rails.logger.info "Received params: #{params.inspect}"
     @friendship_request = FriendshipRequest.new(friendship_request_params)
-    @friendship_request.sender_id = current_user.id
-    @friendship_request.receiver_id = params[:receiver_id]
+    @friendship_request.sender_id = @user.id
+    if @friendship_request.receiver_id.nil?
+      @friendship_request.receiver_id = params[:friendship_request][:receiver_id]
+    end
+
 
     if @friendship_request.save
       render json: @friendship_request, status: :created

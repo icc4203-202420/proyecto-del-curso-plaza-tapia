@@ -2,7 +2,7 @@ class API::V1::UsersController < ApplicationController
   include Authenticable
 
   respond_to :json
-  before_action :set_user, only: [:index, :update, :friendships, :create_friendship]
+  before_action :set_user, only: [:index, :update, :create_friendship]
   before_action :verify_jwt_token, only: [:update, :destroy, :create_friendship]
   skip_before_action :authorize_request, only: [:create]
   
@@ -34,10 +34,11 @@ class API::V1::UsersController < ApplicationController
   end
 
   def friendships
-    friendships = @user.friendships.map do |friendship|
-      User.find(friendship.friend_id)
-    end
-    render json: friendships, status: :ok
+    user = User.find(params[:id])
+    friend_ids = Friendship.where(user_id: user.id).pluck(:friend_id)
+    @friends = User.where(id: friend_ids)
+
+    render json: { friends: @friends }, status: :ok
   end
 
   def create_friendship

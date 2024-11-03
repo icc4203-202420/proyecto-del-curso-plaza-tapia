@@ -42,7 +42,7 @@ const BarsScreen = ({ navigation }) => {
       renderItem={({ item }) => (
         <TouchableOpacity
           style={styles.itemContainer}
-          onPress={() => navigation.navigate('BarDetails', { barId: item.id })}
+          onPress={() => navigation.navigate('Bar', { barId: item.id })}
         >
           <Text style={styles.itemText}>{item.name}</Text>
         </TouchableOpacity>
