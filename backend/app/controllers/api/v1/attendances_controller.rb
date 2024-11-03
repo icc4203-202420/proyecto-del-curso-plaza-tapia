@@ -10,11 +10,9 @@ class API::V1::AttendancesController < ApplicationController
     end
 
     def create
-      # Temporarily using user_id from params (or token if needed later)
-      user_id = params[:user_id] # Expecting this from the request body
-  
+      user_id = params[:user_id]
       attendance = @event.attendances.new(user_id: user_id, checked_in: true)
-  
+      
       if attendance.save
         render json: { message: 'Successfully checked in.' }, status: :created
       else

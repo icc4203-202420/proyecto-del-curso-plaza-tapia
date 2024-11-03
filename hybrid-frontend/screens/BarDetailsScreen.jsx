@@ -17,6 +17,7 @@ const BarDetailsScreen = ({ route }) => {
         });
         const data = await response.json();
         setBar(data.bar);
+        console.log(data.bar);
       } catch (error) {
         console.error('Error fetching bar details:', error);
       } finally {
@@ -30,7 +31,7 @@ const BarDetailsScreen = ({ route }) => {
   const handleCheckIn = async () => {
     try {
       const token = await AsyncStorage.getItem('jwt');
-      
+
       const response = await fetch(`http://${API}:${PORT}/api/v1/events/${barId}/attendances`, {
         method: 'POST',
         headers: {
@@ -38,6 +39,7 @@ const BarDetailsScreen = ({ route }) => {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
+          user_id: 71, // Agrega aquí el ID de usuario de prueba o extrae del token como antes
           checked_in: true,
         }),
       });
