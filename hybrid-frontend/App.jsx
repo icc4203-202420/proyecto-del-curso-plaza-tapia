@@ -21,6 +21,7 @@ import BeerScreen from './screens/BeerScreen';
 import HomeScreen from './screens/HomeScreen';
 import BarsScreen from './screens/BarsScreen';          // Nueva pantalla de lista de bares
 import BarScreen from './screens/BarScreen';
+import EventScreen from './screens/EventScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -63,6 +64,7 @@ const App = () => {
         <Stack.Screen name="Bars" component={BarsScreen} options={({ navigation }) => screenOptions(navigation)} /> 
         <Stack.Screen name="Home" component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
         <Stack.Screen name="Bar" component={BarScreen} options={({ navigation }) => screenOptions(navigation)} />
+        <Stack.Screen name="Event" component={EventScreen} options={({ navigation }) => screenOptions(navigation)} />
       </Stack.Navigator>
     </NavigationContainer>
   );

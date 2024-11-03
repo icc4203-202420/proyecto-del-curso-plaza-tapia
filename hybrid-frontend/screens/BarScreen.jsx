@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Button, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import { API, PORT } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BarScreen = ({ route }) => {
+const BarScreen = ({ route, navigation }) => {
   const { barId } = route.params;
   const [bar, setBar] = useState(null);
-  const [events, setEvents] = useState([]); // Estado para los eventos
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const BarScreen = ({ route }) => {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         const eventsData = await eventsResponse.json();
-        setEvents(eventsData.events); // Guardar eventos en el estado
+        setEvents(eventsData.events);
 
       } catch (error) {
         console.error('Error fetching bar or events details:', error);
@@ -37,34 +37,6 @@ const BarScreen = ({ route }) => {
 
     fetchBarDetails();
   }, [barId]);
-
-  const handleCheckIn = async (eventId) => {
-    try {
-      const token = await AsyncStorage.getItem('jwt');
-      
-      // Realiza la solicitud de check-in directamente
-      const response = await fetch(`http://${API}:${PORT}/api/v1/events/${eventId}/attendances`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          checked_in: true,  // Envia solo el estado de check-in
-        }),
-      });
-  
-      if (response.ok) {
-        Alert.alert("Success", "Check-in successful!");
-      } else {
-        const result = await response.json();
-        Alert.alert("Error", result.error || "Failed to check-in.");
-      }
-    } catch (error) {
-      console.error("Error during check-in:", error);
-      Alert.alert("Error", "An error occurred during check-in.");
-    }
-  };
 
   if (loading) {
     return (
@@ -95,11 +67,12 @@ const BarScreen = ({ route }) => {
         data={events}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.eventContainer}>
+          <TouchableOpacity 
+            style={styles.eventContainer}
+            onPress={() => navigation.navigate('Event', { eventId: item.id })}>
             <Text style={styles.eventTitle}>{item.name}</Text>
             <Text style={styles.eventDetail}>Date: {item.date}</Text>
-            <Button title="Check-in" onPress={() => handleCheckIn(item.id)} />
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>
