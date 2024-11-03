@@ -1,6 +1,7 @@
-class FriendshipRequestsController < ApplicationController
+class API::V1::FriendshipRequestsController < ApplicationController
 
   before_action :set_friendship_request, only: [:accept, :reject]
+  before_action :set_user, only: [:create, :accept, :reject]
 
   def index
   end
@@ -10,8 +11,10 @@ class FriendshipRequestsController < ApplicationController
 
   # POST /friendship_requests
   def create
+    Rails.logger.info "Received params: #{params.inspect}"
     @friendship_request = FriendshipRequest.new(friendship_request_params)
     @friendship_request.sender_id = current_user.id
+    @friendship_request.receiver_id = params[:receiver_id]
 
     if @friendship_request.save
       render json: @friendship_request, status: :created
@@ -47,12 +50,16 @@ class FriendshipRequestsController < ApplicationController
 
   private
 
+  def set_user
+    @user = current_user
+  end
+
   def set_friendship_request
     @friendship_request = FriendshipRequest.find(params[:id])
   end
 
   def friendship_request_params
-    params.require(:friendship_request).permit(:receiver_id)
+    params.require(:friendship_request).permit(:sender_id, :receiver_id)
   end
 
 end

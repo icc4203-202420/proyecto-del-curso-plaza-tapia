@@ -50,6 +50,10 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :friendship_requests do
+        post :receiver_id, to: 'friendship_requests#create', on: :collection
+      end
+
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
       resources :attendances, only: [:create] # Route for creating attendance
 

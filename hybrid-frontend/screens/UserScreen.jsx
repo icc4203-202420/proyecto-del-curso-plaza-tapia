@@ -1,5 +1,5 @@
-import React, { useEffect, useReducer } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList, Alert } from 'react-native';
+import React, { useEffect, useReducer, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, Alert, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
 
@@ -25,6 +25,7 @@ const reducer = (state, action) => {
 const UserScreen = ({ route }) => {
     const { userId } = route.params; // Obtener el ID del usuario desde los parámetros de navegación
     const [state, dispatch] = useReducer(reducer, initialState);
+    const [friendRequestSent, setFriendRequestSent] = useState(false); // Estado para la solicitud de amistad
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -55,6 +56,29 @@ const UserScreen = ({ route }) => {
         return () => dispatch({ type: 'FETCH_INIT' });
     }, [userId]);
 
+    const handleSendFriendRequest = async () => {
+        try {
+            const token = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`http://${API}:${PORT}/api/v1/friendship_requests`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ recipientId: userId }), // Asegúrate de que esto coincida con tu API
+            });
+
+            if (response.ok) {
+                Alert.alert('Success', 'Friend request sent successfully');
+                setFriendRequestSent(true); // Cambiar el estado para reflejar que se envió la solicitud
+            } else {
+                Alert.alert('Error', 'Failed to send friend request');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'An error occurred while sending the friend request');
+        }
+    };
+
     const { loading, user, error } = state;
 
     if (loading) {
@@ -77,6 +101,13 @@ const UserScreen = ({ route }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.userName}>{user.handle}</Text>
+            {friendRequestSent ? (
+                <Text style={styles.friendRequestText}>Friend request sent!</Text>
+            ) : (
+                <TouchableOpacity style={styles.friendRequestButton} onPress={handleSendFriendRequest}>
+                    <Text style={styles.friendRequestButtonText}>Send Friend Request</Text>
+                </TouchableOpacity>
+            )}
             <Text style={styles.sectionTitle}>Reviews</Text>
             {user.reviews.length === 0 ? (
                 <Text style={styles.noReviewsText}>No reviews made by this user</Text>
@@ -106,6 +137,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#F5F5F5',
     },
     loadingText: {
         marginTop: 10,
@@ -116,6 +148,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#F5F5F5',
     },
     errorText: {
         fontSize: 16,
@@ -125,12 +158,15 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 10,
+        textAlign: 'center',
+        color: '#333',
     },
     sectionTitle: {
         fontSize: 20,
         fontWeight: '600',
         color: '#333',
         marginBottom: 10,
+        textAlign: 'left',
     },
     noReviewsText: {
         fontSize: 16,
@@ -140,7 +176,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     reviewContainer: {
-        padding: 10,
+        padding: 15,
         marginBottom: 10,
         backgroundColor: '#FFF',
         borderRadius: 5,
@@ -158,6 +194,25 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#777',
         marginTop: 5,
+    },
+    friendRequestText: {
+        fontSize: 16,
+        color: '#28A745',
+        marginTop: 10,
+        textAlign: 'center',
+    },
+    friendRequestButton: {
+        backgroundColor: '#007BFF',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginBottom: 15,
+        alignItems: 'center',
+    },
+    friendRequestButtonText: {
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 

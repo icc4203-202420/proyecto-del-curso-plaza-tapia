@@ -36,7 +36,7 @@ const RegisterScreen = ({ navigation }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Ocurrió un error');
+        throw new Error(data.message || 'Failed to register');
       }
 
       // Alert.alert('Registro exitoso', data.message);
@@ -56,7 +56,7 @@ const RegisterScreen = ({ navigation }) => {
       const loginData = await loginResponse.json();
 
       if (!loginResponse.ok) {
-        throw new Error(loginData.message || 'Error al iniciar sesión después del registro');
+        throw new Error(loginData.message || 'Failed to login');
       }
 
       // Guardar token JWT en AsyncStorage
@@ -71,7 +71,7 @@ const RegisterScreen = ({ navigation }) => {
       );
 
     } catch (error) {
-      Alert.alert('Error en el registro', error.message);
+      Alert.alert('Error at register', error.message);
       setPassword('');
       setPasswordConfirmation('');
     }
@@ -79,48 +79,48 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text>Registrarse</Text>
+      <Text>Register</Text>
       <TextInput
         style={styles.input}
-        placeholder="Correo electrónico"
+        placeholder="Email"
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
-        placeholder="Nombre"
+        placeholder="Name"
         value={first_name}
         onChangeText={setFirstName}
       />
       <TextInput
         style={styles.input}
-        placeholder="Apellido"
+        placeholder="Lastname"
         value={last_name}
         onChangeText={setLastName}
       />
       <TextInput
         style={styles.input}
-        placeholder="Nombre de usuario"
+        placeholder="Handle"
         value={handle}
         onChangeText={setHandle}
       />
       <TextInput
         style={styles.input}
-        placeholder="Contraseña"
+        placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
       <TextInput
         style={styles.input}
-        placeholder="Confirmación de contraseña"
+        placeholder="Confirm Password"
         value={password_confirmation}
         onChangeText={setPasswordConfirmation}
         secureTextEntry
       />
-      <Button title="Registrarse" onPress={handleRegister} />
+      <Button title="Register" onPress={handleRegister} />
       <Button
-        title="¿Ya tienes una cuenta? Inicia sesión"
+        title="Login"
         onPress={() => navigation.navigate('Login')}
       />
       <StatusBar style="auto" />

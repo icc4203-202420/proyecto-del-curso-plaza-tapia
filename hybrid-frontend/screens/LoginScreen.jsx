@@ -43,7 +43,7 @@ const LoginScreen = ({ navigation }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Ocurrió un error');
+        throw new Error(data.message || 'Failed to login');
       }
 
       await AsyncStorage.setItem('jwt', data.token);
@@ -62,23 +62,23 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text>Iniciar sesión</Text>
+      <Text>Login</Text>
       <TextInput
         style={styles.input}
-        placeholder="Correo electrónico"
+        placeholder="Email"
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
-        placeholder="Contraseña"
+        placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Iniciar sesión" onPress={handleLogin} />
+      <Button title="Login" onPress={handleLogin} />
       <Button
-        title="¿No tienes una cuenta? Regístrate"
+        title="Register"
         onPress={() => navigation.navigate('Register')}
       />
       <StatusBar style="auto" />
