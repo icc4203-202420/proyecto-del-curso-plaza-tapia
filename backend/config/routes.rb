@@ -46,16 +46,18 @@ Rails.application.routes.draw do
       resources :users do
         resources :reviews
         member do
+          put 'notification_token', to: 'users#notification_token'
           get 'friendships', to: 'users#friendships'
           post 'friendships', to: 'users#create_friendship'
-          get 'friendship_requests', to: 'friendship_requests#index'
         end
-        resources :friendship_requests, only: [:index, :create]
       end
 
       resources :friendship_requests do
-        post ':user_id', to: 'friendship_requests#create', on: :collection
-      end      
+        member do
+          post 'accept', to: 'friendship_requests#accept'
+          post 'reject', to: 'friendship_requests#reject'
+        end
+      end
 
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
       resources :attendances, only: [:create] # Route for creating attendance

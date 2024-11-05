@@ -87,7 +87,7 @@ const UserScreen = ({ route }) => {
                 },
                 body: JSON.stringify({ friendship_request: { receiver_id: userId } }),
             });
-
+            console.log(userId);
             if (response.ok) {
                 // Alert.alert('Success', 'Friend request sent successfully');
                 setFriendRequestSent(true); // Cambiar el estado para reflejar que se envió la solicitud

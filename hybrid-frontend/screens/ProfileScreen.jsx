@@ -47,8 +47,6 @@ const ProfileScreen = () => {
 
                 const data = await response.json();
 
-                console.log('Response:', data);
-
                 dispatch({ type: 'FETCH_SUCCESS', payload: data.user });
 
             } catch (error) {

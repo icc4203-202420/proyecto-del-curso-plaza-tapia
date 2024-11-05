@@ -4,8 +4,25 @@ class API::V1::FriendshipRequestsController < ApplicationController
   before_action :set_user, only: [:index, :show, :create, :accept, :reject]
 
   def index
-    requests = @user.friendship_requests
-    render json: { friendship_requests: requests }, status: :ok
+    if @user.id
+      requests = FriendshipRequest.includes(:sender).where(receiver_id: @user.id)
+  
+      # Mapea cada solicitud para incluir el sender_handle en la respuesta JSON
+      formatted_requests = requests.map do |request|
+        {
+          id: request.id,
+          sender_id: request.sender_id,
+          receiver_id: request.receiver_id,
+          created_at: request.created_at,
+          sender_handle: User.find(request.sender_id).handle
+        }
+      end
+  
+      render json: { friendship_requests: formatted_requests }, status: :ok
+      Rails.logger.info "Requests: #{formatted_requests.inspect}"
+    else
+      render json: { error: "User ID is required" }, status: :unprocessable_entity
+    end
   end
 
   def show
@@ -41,18 +58,28 @@ class API::V1::FriendshipRequestsController < ApplicationController
   def destroy
   end
 
-  # PATCH /friendship_requests/:id/accept
   def accept
-    # Create the friendship if not already exists
-    friendship = Friendship.find_or_initialize_by(user_id: @friendship_request.receiver_id, friend_id: @friendship_request.sender_id)
-
-    if friendship.save
-      @friendship_request.destroy # Eliminar la solicitud de amistad
-      render json: { message: 'Friendship accepted' }, status: :ok
+    Rails.logger.info "Friendship request: #{@friendship_request.inspect}"
+    # Asegúrate de que set_friendship_request se llame antes
+    friendship1 = Friendship.find_or_initialize_by(user_id: @friendship_request.receiver_id, friend_id: @friendship_request.sender_id)
+    friendship2 = Friendship.find_or_initialize_by(user_id: @friendship_request.sender_id, friend_id: @friendship_request.receiver_id)
+    Rails.logger.info "Friendship 1: #{friendship1.inspect}"
+    Rails.logger.info "Friendship 2: #{friendship2.inspect}"
+    if friendship1.save
+      if friendship2.save
+        Rails.logger.info "Friendship saved successfully"
+        @friendship_request.destroy # Eliminar la solicitud de amistad
+        render json: { message: 'Friendship accepted' }, status: :ok
+      else
+        Rails.logger.error "Failed to save friendship: #{friendship2.errors.full_messages.join(', ')}"
+        render json: friendship2.errors, status: :unprocessable_entity
+      end
     else
-      render json: friendship.errors, status: :unprocessable_entity
+      Rails.logger.error "Failed to save friendship: #{friendship.errors.full_messages.join(', ')}"
+      render json: friendship1.errors, status: :unprocessable_entity
     end
   end
+  
 
   # DELETE /friendship_requests/:id/reject
   def reject
@@ -67,8 +94,13 @@ class API::V1::FriendshipRequestsController < ApplicationController
   end
 
   def set_friendship_request
-    @friendship_request = FriendshipRequest.find(params[:id])
+    @friendship_request = FriendshipRequest.find_by(id: params[:id])
+    Rails.logger.info "ID request: #{params[:id]}"
+    unless @friendship_request
+      render json: { error: 'Friendship request not found' }, status: :not_found
+    end
   end
+  
 
   def friendship_request_params
     params.require(:friendship_request).permit(:sender_id, :receiver_id)

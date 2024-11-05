@@ -4,6 +4,7 @@ import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, TouchableOpacity } from 'react-native';
 import React from 'react';
+import { NotificationProvider } from './utils/NotificationContext';
 
 import FriendshipRequestsScreen from './screens/FriendshipRequestsScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -46,27 +47,29 @@ const App = () => {
   });
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name='FriendshipRequests' component={FriendshipRequestsScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Register" component={RegisterScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Profile" component={ProfileScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Details" component={DetailsScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Reviews" component={ReviewsScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Friends" component={FriendsScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Review" component={ReviewScreen} options={({ navigation }) => screenOptions(navigation)} />
-        {/* <Stack.Screen name='Friend' component={FriendScreen} options={({ navigation }) => screenOptions(navigation)} /> */}
-        <Stack.Screen name="Beers" component={BeersScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Users" component={UsersScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="User" component={UserScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Beer" component={BeerScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Bars" component={BarsScreen} options={({ navigation }) => screenOptions(navigation)} /> 
-        <Stack.Screen name="Home" component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Bar" component={BarScreen} options={({ navigation }) => screenOptions(navigation)} />
-        <Stack.Screen name="Event" component={EventScreen} options={({ navigation }) => screenOptions(navigation)} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <NotificationProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name='FriendshipRequests' component={FriendshipRequestsScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Register" component={RegisterScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Profile" component={ProfileScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Details" component={DetailsScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Reviews" component={ReviewsScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Friends" component={FriendsScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Review" component={ReviewScreen} options={({ navigation }) => screenOptions(navigation)} />
+          {/* <Stack.Screen name='Friend' component={FriendScreen} options={({ navigation }) => screenOptions(navigation)} /> */}
+          <Stack.Screen name="Beers" component={BeersScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Users" component={UsersScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="User" component={UserScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Beer" component={BeerScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Bars" component={BarsScreen} options={({ navigation }) => screenOptions(navigation)} /> 
+          <Stack.Screen name="Home" component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Bar" component={BarScreen} options={({ navigation }) => screenOptions(navigation)} />
+          <Stack.Screen name="Event" component={EventScreen} options={({ navigation }) => screenOptions(navigation)} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </NotificationProvider>
   );
 }
 

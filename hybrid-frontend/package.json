@@ -11,6 +11,8 @@
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-firebase/app": "^21.3.0",
+    "@react-native-firebase/messaging": "^21.3.0",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
     "@reduxjs/toolkit": "^2.3.0",
@@ -20,6 +22,7 @@
     "expo": "^51.0.38",
     "expo-image-picker": "~15.0.7",
     "expo-status-bar": "~1.12.1",
+    "firebase-admin": "^12.7.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "react": "18.2.0",
