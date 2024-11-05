@@ -12,13 +12,22 @@ class API::V1::EventsController < ApplicationController
   end
 
   def show
+    event_photos = @event.event_pictures.map do |event_picture|
+      {
+        id: event_picture.id,
+        description: event_picture.description,
+        url: event_picture.photo.attached? ? url_for(event_picture.photo) : nil
+      }
+    end
+
     if @event.flyer.attached?
-      render json:@event.as_json.merge({
+      render json: @event.as_json.merge({
         image_url: url_for(@event.flyer),
-        thumbnail_url: url_for(@event.thumbnail)}),
-        status: :ok
+        thumbnail_url: url_for(@event.thumbnail),
+        photos: event_photos
+      }), status: :ok
     else
-      render json: { event: @event.as_json }, status: :ok     
+      render json: { event: @event.as_json, photos: event_photos }, status: :ok     
     end
   end
 

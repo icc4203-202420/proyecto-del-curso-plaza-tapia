@@ -19,7 +19,9 @@ const EventScreen = ({ route }) => {
         });
         const data = await response.json();
         setEvent(data.event);
-        setPhotos(data.photos || []); // Asume que el backend devuelve las fotos asociadas al evento
+        setPhotos(data.photos || []); // Supone que el backend devuelve las fotos asociadas al evento
+
+        console.log("Photos data:", data.photos);
       } catch (error) {
         console.error('Error fetching event details:', error);
       } finally {
@@ -56,24 +58,25 @@ const EventScreen = ({ route }) => {
     }
   };
 
-  const handleSelectPhoto = () => {
-    launchImageLibrary({ mediaType: 'photo' }, (response) => {
-      if (response.didCancel || response.error) {
-        console.error('User cancelled image picker or there was an error.');
-      } else {
-        const photo = response.assets[0];
-        handleUploadPhoto(photo);
-      }
+  const handleSelectPhoto = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
     });
+
+    if (!result.cancelled) {
+      handleUploadPhoto(result);
+    }
   };
 
   const handleUploadPhoto = async (photo) => {
     const token = await AsyncStorage.getItem('jwt');
     const formData = new FormData();
-    formData.append('photo', {
+    formData.append('event_picture[photo]', {
       uri: photo.uri,
-      type: photo.type,
-      name: photo.fileName,
+      type: 'image/jpeg',
+      name: 'photo.jpg',
     });
 
     try {
@@ -89,7 +92,7 @@ const EventScreen = ({ route }) => {
       if (response.ok) {
         Alert.alert("Success", "Photo uploaded successfully!");
         const newPhoto = await response.json();
-        setPhotos((prevPhotos) => [...prevPhotos, newPhoto]); // Actualiza la lista de fotos
+        setPhotos((prevPhotos) => [...prevPhotos, newPhoto]);
       } else {
         Alert.alert("Error", "Failed to upload photo.");
       }
@@ -173,6 +176,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     resizeMode: 'cover',
+    borderWidth: 1,        // Agrega un borde
+    borderColor: '#ccc',   // Color del borde
     borderRadius: 10,
     marginBottom: 10,
   },

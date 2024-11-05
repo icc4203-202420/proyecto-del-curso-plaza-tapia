@@ -39,6 +39,7 @@ Rails.application.routes.draw do
         member do
           get 'attendances', to: 'attendances#index' # Route to get users attending the event
           post 'attendances', to: 'attendances#create' # Route to create attendance
+          post 'photos', to: 'event_pictures#create'
         end
       end
 
