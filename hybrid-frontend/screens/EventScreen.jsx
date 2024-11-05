@@ -65,13 +65,26 @@ const EventScreen = ({ route }) => {
       quality: 1,
     });
 
-    if (!result.cancelled) {
-      handleUploadPhoto(result);
+    // Verifica la estructura del resultado
+    console.log("ImagePicker Result:", result);
+
+    // Asegúrate de que la imagen se seleccionó correctamente y tiene un URI
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+        const photo = result.assets[0]; // Accedemos a la primera imagen seleccionada
+        handleUploadPhoto(photo);
+    } else {
+        console.log("User cancelled image picker or there was an error.");
     }
   };
 
   const handleUploadPhoto = async (photo) => {
     const token = await AsyncStorage.getItem('jwt');
+
+    console.log("Photo URI:", photo.uri);
+    console.log("Photo Type:", 'image/jpeg');
+    console.log("Photo Name:", 'photo.jpg');
+
+
     const formData = new FormData();
     formData.append('event_picture[photo]', {
       uri: photo.uri,
