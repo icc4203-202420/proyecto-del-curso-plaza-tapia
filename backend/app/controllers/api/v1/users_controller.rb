@@ -54,6 +54,15 @@ class API::V1::UsersController < ApplicationController
     
   end
 
+  def token
+    user = User.find(params[:id])
+    if user.update_notification_token(params[:token])
+      render json: { message: 'Token updated' } # Asegúrate de que 'notification_token' sea el atributo correcto
+    else
+      render json: { error: 'Failed to update token' }, status: :not_found
+    end
+  end
+
   private
 
   def set_user
