@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, TextInput, FlatList, Touchab
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
 import { jwtDecode } from "jwt-decode";
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 // Estado inicial para el reducer
 const initialState = {
@@ -30,35 +31,38 @@ const FriendsScreen = ({ navigation }) => {
     const [query, setQuery] = useState('');
     const [filteredFriends, setFilteredFriends] = useState([]);
 
-    useEffect(() => {
-        const fetchFriends = async () => {
-            dispatch({ type: 'FETCH_INIT' });
+    // Use useFocusEffect to fetch friends when the screen is focused
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchFriends = async () => {
+                dispatch({ type: 'FETCH_INIT' });
 
-            try {
-                const token = await AsyncStorage.getItem('jwt');
-                const decodedToken = jwtDecode(token);
-                const userId = decodedToken.user_id;
-                const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}/friendships`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-                const data = await response.json();
-
-                if (response.ok) {
-                    dispatch({ type: 'FETCH_SUCCESS', payload: data.friendships });
-                    setFilteredFriends(data.friendships); // Inicializa el estado de amistades filtradas
-                } else {
+                try {
+                    const token = await AsyncStorage.getItem('jwt');
+                    const decodedToken = jwtDecode(token);
+                    const userId = decodedToken.user_id;
+                    const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}/friendships`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    const data = await response.json();
+                    console.log(`data`, data);
+                    if (response.ok) {
+                        dispatch({ type: 'FETCH_SUCCESS', payload: data.friends }); // Changed from data.friendships to data.friends
+                        setFilteredFriends(data.friends); // Initialize filtered friends correctly
+                    } else {
+                        dispatch({ type: 'FETCH_FAILURE', payload: 'Failed to load friends' });
+                    }
+                } catch (error) {
                     dispatch({ type: 'FETCH_FAILURE', payload: 'Failed to load friends' });
                 }
-            } catch (error) {
-                dispatch({ type: 'FETCH_FAILURE', payload: 'Failed to load friends' });
-            }
-        };
+            };
 
-        fetchFriends();
-    }, []);
+            fetchFriends();
+        }, [])
+    );
 
     useEffect(() => {
         // Solo intentamos acceder a length si state.friends está definido
