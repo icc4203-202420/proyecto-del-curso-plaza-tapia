@@ -11,18 +11,21 @@ const BeerScreen = ({ route, navigation }) => {
   const [bars, setBars] = useState([]);
   const [review, setReview] = useState([]);
   const [userReviewExists, setUserReviewExists] = useState(false);
+  const [api, setAPI] = useState(API);
+  const [port, setPORT] = useState(PORT);
 
   useEffect(() => {
     const fetchBeerDetails = async () => {
       try {
+        console.log(`API: ${api}, PORT: ${port}`);
         const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}`, {
+        const response = await fetch(`http://${api}:${port}/api/v1/beers/${beerId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         setBeer(data.beer);
 
-        const reviewResponse = await fetch(`http://${API}:${PORT}/api/v1/reviews`, {
+        const reviewResponse = await fetch(`http://${api}:${port}/api/v1/reviews`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const reviewData = await reviewResponse.json();
@@ -31,14 +34,14 @@ const BeerScreen = ({ route, navigation }) => {
         setUserReviewExists(filteredReviews.length > 0);
 
         if (data.beer.brand_id) {
-          const brandResponse = await fetch(`http://${API}:${PORT}/api/v1/brands/${data.beer.brand_id}`, {
+          const brandResponse = await fetch(`http://${api}:${port}/api/v1/brands/${data.beer.brand_id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const brandData = await brandResponse.json();
           setBrand(brandData.name);
 
           if (brandData && brandData.brewery_id) {
-            const breweryResponse = await fetch(`http://${API}:${PORT}/api/v1/breweries/${brandData.brewery_id}`, {
+            const breweryResponse = await fetch(`http://${api}:${port}/api/v1/breweries/${brandData.brewery_id}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             const breweryData = await breweryResponse.json();
@@ -46,7 +49,7 @@ const BeerScreen = ({ route, navigation }) => {
           }
         }
 
-        const barsResponse = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}/bars`, {
+        const barsResponse = await fetch(`http://${api}:${port}/api/v1/beers/${beerId}/bars`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const barsData = await barsResponse.json();

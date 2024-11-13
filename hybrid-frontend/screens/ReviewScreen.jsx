@@ -7,10 +7,11 @@ import { API, PORT } from '@env';
 
 const ReviewScreen = ({ route, navigation }) => {
     const { beerId } = route.params;
-    // Estados para la reseña y el rating
     const [reviewText, setReviewText] = useState('');
-    const [rating, setRating] = useState(1);  // Inicializa el rating en 1
-    // Función para enviar la reseña al backend
+    const [rating, setRating] = useState(1);
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
+
     const handleSubmitReview = async () => {
         if (reviewText.length < 15) {
             Alert.alert('Error', 'The review must be at least 15 characters long.');
@@ -27,7 +28,7 @@ const ReviewScreen = ({ route, navigation }) => {
         try {
 
             const token = await AsyncStorage.getItem('jwt');
-            const response = await fetch(`http://${API}:${PORT}/api/v1/reviews`, {
+            const response = await fetch(`http://${api}:${port}/api/v1/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

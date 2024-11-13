@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
@@ -26,6 +26,8 @@ const reducer = (state, action) => {
 
 const ReviewsScreen = ({ route }) => {
     const { beerId } = route.params;
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
 
     // useReducer para manejar el estado de carga, error y reseñas
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -36,7 +38,7 @@ const ReviewsScreen = ({ route }) => {
 
             try {
                 const token = await AsyncStorage.getItem('jwt');
-                const response = await fetch(`http://${API}:${PORT}/api/v1/beers/${beerId}/reviews`, {
+                const response = await fetch(`http://${api}:${port}/api/v1/beers/${beerId}/reviews`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',

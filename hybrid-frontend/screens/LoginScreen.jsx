@@ -8,6 +8,8 @@ import { StatusBar } from 'expo-status-bar';
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [api, setAPI] = useState(API);
+  const [port, setPORT] = useState(PORT);
 
   useEffect(() => {
     const token = async () => {
@@ -25,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
   }, []);
 
   const handleLogin = async () => {
-    const url = `http://${API}:${PORT}/api/v1/login`;
+    const url = `http://${api}:${port}/api/v1/login`;
     try {
       const response = await fetch(url, {
         method: 'POST',

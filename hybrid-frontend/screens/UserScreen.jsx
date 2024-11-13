@@ -26,14 +26,17 @@ const UserScreen = ({ route }) => {
     const { userId } = route.params; // Obtener el ID del usuario desde los parámetros de navegación
     const [state, dispatch] = useReducer(reducer, initialState);
     const [friendRequestSent, setFriendRequestSent] = useState(false); // Estado para la solicitud de amistad
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
 
     useEffect(() => {
+        console.log(`API: ${api}, PORT: ${port}`);
         const fetchUserDetails = async () => {
             dispatch({ type: 'FETCH_INIT' });
 
             try {
                 const token = await AsyncStorage.getItem('jwt');
-                const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}`, {
+                const response = await fetch(`http://${api}:${port}/api/v1/users/${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -54,7 +57,7 @@ const UserScreen = ({ route }) => {
         const checkFriendRequest = async () => {
             try {
                 const token = await AsyncStorage.getItem('jwt');
-                const response = await fetch(`http://${API}:${PORT}/api/v1/friendship_requests/show?receiver_id=${userId}`, {
+                const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/show?receiver_id=${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -79,7 +82,7 @@ const UserScreen = ({ route }) => {
     const handleSendFriendRequest = async () => {
         try {
             const token = await AsyncStorage.getItem('jwt');
-            const response = await fetch(`http://${API}:${PORT}/api/v1/friendship_requests`, {
+            const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

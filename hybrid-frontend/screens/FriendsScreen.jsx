@@ -27,6 +27,8 @@ const reducer = (state, action) => {
 };
 
 const FriendsScreen = ({ navigation }) => {
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
     const [state, dispatch] = useReducer(reducer, initialState);
     const [query, setQuery] = useState('');
     const [filteredFriends, setFilteredFriends] = useState([]);
@@ -38,10 +40,11 @@ const FriendsScreen = ({ navigation }) => {
                 dispatch({ type: 'FETCH_INIT' });
 
                 try {
+                    console.log(`API: ${api}, PORT: ${port}`);
                     const token = await AsyncStorage.getItem('jwt');
                     const decodedToken = jwtDecode(token);
                     const userId = decodedToken.user_id;
-                    const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}/friendships`, {
+                    const response = await fetch(`http://${api}:${port}/api/v1/users/${userId}/friendships`, {
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json',

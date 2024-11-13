@@ -14,9 +14,11 @@ const RegisterScreen = ({ navigation }) => {
   const [password_confirmation, setPasswordConfirmation] = useState('');
 
   const handleRegister = async () => {
-    const url = `http://${API}:${PORT}/api/v1/signup`;
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
+    
     try {
-      const response = await fetch(url, {
+      const response = await fetch(`http://${api}:${port}/api/v1/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +42,7 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       // Alert.alert('Registro exitoso', data.message);
-      const loginResponse = await fetch(`http://${API}:${PORT}/api/v1/login`, {
+      const loginResponse = await fetch(`http://${api}:${port}/api/v1/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

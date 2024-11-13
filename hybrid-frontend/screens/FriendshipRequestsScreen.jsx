@@ -6,8 +6,10 @@ import { jwtDecode } from 'jwt-decode';
 
 const handleAccept = async (requestId, fetchRequests) => {
     try {
+        const [api, setAPI] = useState(API);
+        const [port, setPORT] = useState(PORT);
         const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${API}:${PORT}/api/v1/friendship_requests/${requestId}/accept`, {
+        const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/${requestId}/accept`, {
             method: 'POST',  // Cambia a POST si la ruta está definida como un POST
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -28,8 +30,10 @@ const handleAccept = async (requestId, fetchRequests) => {
 
 const handleReject = async (requestId, fetchRequests) => {
     try {
+        const [api, setAPI] = useState(API);
+        const [port, setPORT] = useState(PORT);
         const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${API}:${PORT}/api/v1/friendship_requests/${requestId}/reject`, {
+        const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/${requestId}/reject`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -75,10 +79,12 @@ const FriendshipRequestsScreen = ({ navigation }) => {
         dispatch({ type: 'FETCH_INIT' });
 
         try {
+            const [api, setAPI] = useState(API);
+            const [port, setPORT] = useState(PORT);
             const token = await AsyncStorage.getItem('jwt');
             const decodedToken = jwtDecode(token);
             const userId = decodedToken.user_id;
-            const response = await fetch(`http://${API}:${PORT}/api/v1/friendship_requests?user_id=${userId}`, {
+            const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests?user_id=${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',

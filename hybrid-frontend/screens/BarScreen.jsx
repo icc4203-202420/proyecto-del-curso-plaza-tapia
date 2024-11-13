@@ -8,6 +8,8 @@ const BarScreen = ({ route, navigation }) => {
   const [bar, setBar] = useState(null);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [api, setAPI] = useState(API);
+  const [port, setPORT] = useState(PORT);
 
   useEffect(() => {
     const fetchBarDetails = async () => {
@@ -15,14 +17,14 @@ const BarScreen = ({ route, navigation }) => {
         const token = await AsyncStorage.getItem('jwt');
 
         // Obtener detalles del bar
-        const barResponse = await fetch(`http://${API}:${PORT}/api/v1/bars/${barId}`, {
+        const barResponse = await fetch(`http://${api}:${port}/api/v1/bars/${barId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         const barData = await barResponse.json();
         setBar(barData.bar);
 
         // Obtener eventos asociados al bar
-        const eventsResponse = await fetch(`http://${API}:${PORT}/api/v1/bars/${barId}/events`, {
+        const eventsResponse = await fetch(`http://${api}:${port}/api/v1/bars/${barId}/events`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         const eventsData = await eventsResponse.json();

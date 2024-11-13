@@ -3,8 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useState }  from 'react';
 import { NotificationProvider } from './utils/NotificationContext';
+import { API, PORT } from '@env';
 
 import FriendshipRequestsScreen from './screens/FriendshipRequestsScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -28,6 +29,8 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
 
+  const [api, setAPI] = useState(API);
+  const [port, setPORT] = useState(PORT);
   const handleLogout = async (navigation) => {
     await AsyncStorage.removeItem('jwt');
     navigation.dispatch(
@@ -45,6 +48,8 @@ const App = () => {
       </TouchableOpacity>
     ),
   });
+
+  console.log(`API: ${api}, PORT: ${port}`);
 
   return (
     <NotificationProvider>

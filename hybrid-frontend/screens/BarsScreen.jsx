@@ -6,12 +6,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const BarsScreen = ({ navigation }) => {
   const [bars, setBars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [api, setAPI] = useState(API);
+  const [port, setPORT] = useState(PORT);
 
   useEffect(() => {
     const fetchBars = async () => {
       try {
         const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${API}:${PORT}/api/v1/bars`, {
+        const response = await fetch(`http://${api}:${port}/api/v1/bars`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();

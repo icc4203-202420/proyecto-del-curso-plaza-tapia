@@ -8,12 +8,15 @@ const BeersScreen = ({ navigation }) => {
     const [query, setQuery] = useState('');
     const [beers, setBeers] = useState([]);
     const [filteredBeers, setFilteredBeers] = useState([]);
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
+
     useEffect(() => {
         const fetchBeers = async () => {
             try {
                 const token = await AsyncStorage.getItem('jwt');
                 console.log('Token:', token);
-                const response = await axios.get(`http://${API}:${PORT}/api/v1/beers`, {
+                const response = await axios.get(`http://${api}:${port}/api/v1/beers`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`,

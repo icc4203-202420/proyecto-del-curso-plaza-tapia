@@ -26,8 +26,11 @@ const reducer = (state, action) => {
 };
 
 const ProfileScreen = () => {
+    console.log(`API: ${api}, PORT: ${port}`);
     const [state, dispatch] = useReducer(reducer, initialState);
     const navigation = useNavigation();
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -38,7 +41,7 @@ const ProfileScreen = () => {
                 const decodedToken = jwtDecode(token);
                 // console.log('Decoded Token:', decodedToken);
                 const userId = decodedToken.user_id;
-                const response = await fetch(`http://${API}:${PORT}/api/v1/users/${userId}`, {
+                const response = await fetch(`http://${api}:${port}/api/v1/users/${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',

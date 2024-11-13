@@ -9,12 +9,14 @@ const EventScreen = ({ route }) => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [photos, setPhotos] = useState([]);
+  const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
         const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${API}:${PORT}/api/v1/events/${eventId}`, {
+        const response = await fetch(`http://${api}:${port}/api/v1/events/${eventId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         const data = await response.json();
@@ -35,7 +37,7 @@ const EventScreen = ({ route }) => {
   const handleCheckIn = async () => {
     try {
       const token = await AsyncStorage.getItem('jwt');
-      const response = await fetch(`http://${API}:${PORT}/api/v1/events/${eventId}/attendances`, {
+      const response = await fetch(`http://${api}:${port}/api/v1/events/${eventId}/attendances`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +95,7 @@ const EventScreen = ({ route }) => {
     });
 
     try {
-      const response = await fetch(`http://${API}:${PORT}/api/v1/events/${eventId}/photos`, {
+      const response = await fetch(`http://${api}:${port}/api/v1/events/${eventId}/photos`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

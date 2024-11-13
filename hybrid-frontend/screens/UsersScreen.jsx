@@ -28,14 +28,17 @@ const UsersScreen = ({ navigation }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const [query, setQuery] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
 
     useEffect(() => {
+
         const fetchUsers = async () => {
             dispatch({ type: 'FETCH_INIT' });
 
             try {
                 const token = await AsyncStorage.getItem('jwt');
-                const response = await fetch(`http://${API}:${PORT}/api/v1/users`, {
+                const response = await fetch(`http://${api}:${port}/api/v1/users`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
