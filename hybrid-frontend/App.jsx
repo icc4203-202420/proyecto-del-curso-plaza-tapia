@@ -29,8 +29,6 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
 
-  const [api, setAPI] = useState(API);
-  const [port, setPORT] = useState(PORT);
   const handleLogout = async (navigation) => {
     await AsyncStorage.removeItem('jwt');
     navigation.dispatch(
@@ -48,8 +46,6 @@ const App = () => {
       </TouchableOpacity>
     ),
   });
-
-  console.log(`API: ${api}, PORT: ${port}`);
 
   return (
     <NotificationProvider>

@@ -29,6 +29,8 @@ const UserScreen = ({ route }) => {
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
+    console.log(`API: ${api}, PORT: ${port}`);
+
     useEffect(() => {
         console.log(`API: ${api}, PORT: ${port}`);
         const fetchUserDetails = async () => {

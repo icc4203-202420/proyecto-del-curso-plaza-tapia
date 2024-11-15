@@ -1,5 +1,6 @@
 {
   "expo": {
+    "newArchEnabled": true,
     "name": "hybrid-frontend",
     "slug": "hybrid-frontend",
     "version": "1.0.0",

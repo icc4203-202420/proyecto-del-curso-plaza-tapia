@@ -31,6 +31,8 @@ const UsersScreen = ({ navigation }) => {
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
+    console.log(`API: ${api}, PORT: ${port}`);
+
     useEffect(() => {
 
         const fetchUsers = async () => {

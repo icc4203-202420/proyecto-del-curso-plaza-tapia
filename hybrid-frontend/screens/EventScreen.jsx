@@ -10,7 +10,8 @@ const EventScreen = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [photos, setPhotos] = useState([]);
   const [api, setAPI] = useState(API);
-    const [port, setPORT] = useState(PORT);
+  const [port, setPORT] = useState(PORT);
+  console.log(`API: ${api}, PORT: ${port}`);
 
   useEffect(() => {
     const fetchEventDetails = async () => {

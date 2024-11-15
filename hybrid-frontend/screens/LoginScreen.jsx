@@ -11,6 +11,8 @@ const LoginScreen = ({ navigation }) => {
   const [api, setAPI] = useState(API);
   const [port, setPORT] = useState(PORT);
 
+  console.log(`API: ${api}, PORT: ${port}`);
+
   useEffect(() => {
     const token = async () => {
       const token = await AsyncStorage.getItem('jwt');

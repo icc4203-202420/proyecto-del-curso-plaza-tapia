@@ -12,10 +12,12 @@ const RegisterScreen = ({ navigation }) => {
   const [handle, setHandle] = useState('');
   const [password, setPassword] = useState('');
   const [password_confirmation, setPasswordConfirmation] = useState('');
+  const [api, setAPI] = useState(API);
+  const [port, setPORT] = useState(PORT);
+
+  console.log(`API: ${api}, PORT: ${port}`);
 
   const handleRegister = async () => {
-    const [api, setAPI] = useState(API);
-    const [port, setPORT] = useState(PORT);
     
     try {
       const response = await fetch(`http://${api}:${port}/api/v1/signup`, {

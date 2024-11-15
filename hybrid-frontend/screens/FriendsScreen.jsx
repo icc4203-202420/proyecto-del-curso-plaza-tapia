@@ -33,6 +33,8 @@ const FriendsScreen = ({ navigation }) => {
     const [query, setQuery] = useState('');
     const [filteredFriends, setFilteredFriends] = useState([]);
 
+    console.log(`API: ${api}, PORT: ${port}`);
+
     // Use useFocusEffect to fetch friends when the screen is focused
     useFocusEffect(
         React.useCallback(() => {

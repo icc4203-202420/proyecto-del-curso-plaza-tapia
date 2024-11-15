@@ -8,6 +8,9 @@ const handleAccept = async (requestId, fetchRequests) => {
     try {
         const [api, setAPI] = useState(API);
         const [port, setPORT] = useState(PORT);
+
+        console.log(`API: ${api}, PORT: ${port}`);
+
         const token = await AsyncStorage.getItem('jwt');
         const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/${requestId}/accept`, {
             method: 'POST',  // Cambia a POST si la ruta está definida como un POST
@@ -16,6 +19,7 @@ const handleAccept = async (requestId, fetchRequests) => {
                 'Content-Type': 'application/json',
             },
         });
+
 
         if (response.ok) {
             fetchRequests(); // Re-fetch friendship requests after acceptance
@@ -32,6 +36,9 @@ const handleReject = async (requestId, fetchRequests) => {
     try {
         const [api, setAPI] = useState(API);
         const [port, setPORT] = useState(PORT);
+
+        console.log(`API: ${api}, PORT: ${port}`);
+        
         const token = await AsyncStorage.getItem('jwt');
         const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/${requestId}/reject`, {
             method: 'POST',
@@ -81,6 +88,9 @@ const FriendshipRequestsScreen = ({ navigation }) => {
         try {
             const [api, setAPI] = useState(API);
             const [port, setPORT] = useState(PORT);
+
+            console.log(`API: ${api}, PORT: ${port}`);
+            
             const token = await AsyncStorage.getItem('jwt');
             const decodedToken = jwtDecode(token);
             const userId = decodedToken.user_id;

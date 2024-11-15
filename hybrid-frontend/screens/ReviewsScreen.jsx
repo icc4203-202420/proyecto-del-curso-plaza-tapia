@@ -29,6 +29,8 @@ const ReviewsScreen = ({ route }) => {
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
+    console.log(`API: ${api}, PORT: ${port}`);
+
     // useReducer para manejar el estado de carga, error y reseñas
     const [state, dispatch] = useReducer(reducer, initialState);
 

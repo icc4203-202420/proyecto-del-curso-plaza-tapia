@@ -13,6 +13,7 @@ const BeerScreen = ({ route, navigation }) => {
   const [userReviewExists, setUserReviewExists] = useState(false);
   const [api, setAPI] = useState(API);
   const [port, setPORT] = useState(PORT);
+  console.log(`API: ${api}, PORT: ${port}`);
 
   useEffect(() => {
     const fetchBeerDetails = async () => {

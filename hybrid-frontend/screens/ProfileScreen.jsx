@@ -32,6 +32,8 @@ const ProfileScreen = () => {
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
+    console.log(`API: ${api}, PORT: ${port}`);
+
     useEffect(() => {
         const fetchUserDetails = async () => {
             dispatch({ type: 'FETCH_INIT' });

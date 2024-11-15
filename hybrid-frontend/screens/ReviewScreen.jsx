@@ -12,6 +12,8 @@ const ReviewScreen = ({ route, navigation }) => {
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
+    console.log(`API: ${api}, PORT: ${port}`);
+
     const handleSubmitReview = async () => {
         if (reviewText.length < 15) {
             Alert.alert('Error', 'The review must be at least 15 characters long.');
