@@ -1,62 +1,10 @@
-import React, { useEffect, useReducer } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Button } from 'react-native';
+import React, { useEffect, useReducer, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
 import { jwtDecode } from 'jwt-decode';
 
-const handleAccept = async (requestId, fetchRequests) => {
-    try {
-        const [api, setAPI] = useState(API);
-        const [port, setPORT] = useState(PORT);
 
-        console.log(`API: ${api}, PORT: ${port}`);
-
-        const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/${requestId}/accept`, {
-            method: 'POST',  // Cambia a POST si la ruta está definida como un POST
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-
-        if (response.ok) {
-            fetchRequests(); // Re-fetch friendship requests after acceptance
-        } else {
-            console.error('Failed to accept request');
-        }
-    } catch (error) {
-        console.error('Error accepting request:', error);
-    }
-};
-
-
-const handleReject = async (requestId, fetchRequests) => {
-    try {
-        const [api, setAPI] = useState(API);
-        const [port, setPORT] = useState(PORT);
-
-        console.log(`API: ${api}, PORT: ${port}`);
-        
-        const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/${requestId}/reject`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (response.ok) {
-            fetchRequests(); // Re-fetch friendship requests after rejection
-        } else {
-            console.error('Failed to reject request');
-        }
-    } catch (error) {
-        console.error('Error rejecting request:', error);
-    }
-};
 
 // Estado inicial para el reducer
 const initialState = {
@@ -80,17 +28,61 @@ const reducer = (state, action) => {
 };
 
 const FriendshipRequestsScreen = ({ navigation }) => {
+    const [api, setAPI] = useState(API);
+    const [port, setPORT] = useState(PORT);
+
+    console.log(`API: ${api}, PORT: ${port}`);
+
+    const handleAccept = async (requestId, fetchRequests) => {
+        try {
+            const token = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/${requestId}/accept`, {
+                method: 'POST',  // Cambia a POST si la ruta no está definida como un POST
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+    
+            if (response.ok) {
+                fetchRequests(); // Re-fetch friendship requests after acceptance
+            } else {
+                console.error('Failed to accept request');
+            }
+        } catch (error) {
+            console.error('Error accepting request:', error);
+        }
+    };
+    
+    
+    const handleReject = async (requestId, fetchRequests) => {
+        try {
+            const token = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`http://${api}:${port}/api/v1/friendship_requests/${requestId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (response.ok) {
+                fetchRequests(); // Re-fetch friendship requests after rejection
+            } else {
+                console.error('Failed to reject request');
+            }
+        } catch (error) {
+            console.error('Error rejecting request:', error);
+        }
+    };
+
     const [state, dispatch] = useReducer(reducer, initialState);
 
     const fetchRequests = async () => {
         dispatch({ type: 'FETCH_INIT' });
 
-        try {
-            const [api, setAPI] = useState(API);
-            const [port, setPORT] = useState(PORT);
-
-            console.log(`API: ${api}, PORT: ${port}`);
-            
+        try { 
             const token = await AsyncStorage.getItem('jwt');
             const decodedToken = jwtDecode(token);
             const userId = decodedToken.user_id;
