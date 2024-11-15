@@ -22,6 +22,15 @@ class API::V1::ReviewsController < ApplicationController
       beer = @review.beer
       beer.update_avg_rating
       render json: @review, status: :created, location: api_v1_review_url(@review)
+      
+      # Emite la reseña a los amigos del usuario
+      @user.friends.each do |friend|
+        FeedChannel.broadcast_to(friend, {
+          type: 'new_review',
+          review: @review,
+          beer: { id: beer.id, name: beer.name }
+        })
+      end
     else
       render json: @review.errors, status: :unprocessable_entity
     end
@@ -38,6 +47,18 @@ class API::V1::ReviewsController < ApplicationController
   def destroy
     @review.destroy
     head :no_content
+  end
+
+  def friends_reviews
+    # Encuentra al usuario actual
+    @user = current_user
+    # Encuentra todos los amigos del usuario
+    friends = @user.friends
+  
+    # Encuentra todas las reseñas hechas por los amigos
+    @reviews = Review.where(user: friends).order(created_at: :desc)
+  
+    render json: { reviews: @reviews }
   end
 
   private

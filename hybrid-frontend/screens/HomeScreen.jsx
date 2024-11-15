@@ -46,6 +46,10 @@ const HomeScreen = () => {
                     <Icon name="heart-outline" size={30} color="#e91e63" />
                     <Text style={styles.categoryText}>Friends</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.categoryButton} onPress={() => navigation.navigate('Feed')}>
+                    <Icon name="car-outline" size={30} color="gray" />
+                    <Text style={styles.categoryText}>Feed</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
