@@ -19,7 +19,8 @@ module API
             render json: {
               id: @event_picture.id,
               description: @event_picture.description,
-              url: image_url
+              url: image_url,
+              tagged_users: @event_picture.tagged_users
             }, status: :created
           else
             render json: { error: 'Photo attachment failed' }, status: :unprocessable_entity
@@ -40,7 +41,7 @@ module API
       end
 
       def event_picture_params
-        params.require(:event_picture).permit(:description, :photo)
+        params.require(:event_picture).permit(:description, :photo, tagged_users: [])
       end
     end
   end
