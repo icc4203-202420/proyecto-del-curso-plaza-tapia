@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Button, Alert, Image, FlatList, TextInput, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Ensure the package is installed
 import { API, PORT } from '@env';
+import { jwtDecode } from "jwt-decode";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -38,11 +39,14 @@ const EventScreen = ({ route }) => {
     const fetchFriends = async () => {
       try {
         const token = await AsyncStorage.getItem('jwt');
-        const response = await fetch(`http://${api}:${port}/api/v1/users/current_user/friendships`, {
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.user_id;
+        const response = await fetch(`http://${api}:${port}/api/v1/users/${userId}/friendships`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         const data = await response.json();
         setFriends(data.friends || []);
+        console.log(data.friends);
       } catch (error) {
         console.error('Error fetching friends:', error);
       }

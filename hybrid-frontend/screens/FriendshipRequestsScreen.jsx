@@ -31,7 +31,8 @@ const FriendshipRequestsScreen = ({ navigation }) => {
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
-    console.log(`API: ${api}, PORT: ${port}`);
+    // con este console log, se cambia al puerto localhost y deja de funcionar
+    // console.log(`API: ${api}, PORT: ${port}`);
 
     const handleAccept = async (requestId, fetchRequests) => {
         try {
