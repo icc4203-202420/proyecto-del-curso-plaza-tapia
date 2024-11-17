@@ -1,79 +1,78 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import jwtDecode from 'jwt-decode'; // Para decodificar el JWT
-import { API, PORT } from '@env'; // Para obtener la variable de entorno API
+import jwtDecode from 'jwt-decode'; 
+import { API, PORT } from '@env'; 
 
 const FeedScreen = () => {
-  const [posts, setPosts] = useState([]); // Estado para las reseñas
-  const [loading, setLoading] = useState(true); // Estado de carga
-  const [refreshing, setRefreshing] = useState(false); // Estado para saber si se está refrescando
-  const [api, setAPI] = useState(API); // Estado para la variable de entorno API
-  const [port, setPORT] = useState(PORT); // Estado para la variable de entorno PORT
+  const [posts, setPosts] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [refreshing, setRefreshing] = useState(false); 
+  const [api, setAPI] = useState(API); 
+  const [port, setPORT] = useState(PORT); 
 
-  // Obtener las reseñas de los amigos al montar el componente
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      // Obtener el token JWT
+      
       const token = await AsyncStorage.getItem('jwt');
       if (!token) {
-        Alert.alert('Error', 'No se encontró el token de autenticación.');
+        Alert.alert('Error', 'Authentication token not found.');
         return;
       }
 
-      // Hacer la solicitud para obtener las reseñas de los amigos
       const response = await fetch(`http://${api}:${port}/api/v1/friends_reviews`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Autenticación con el token
+          'Authorization': `Bearer ${token}`, 
         },
       });
 
       const result = await response.json();
       if (response.ok) {
-        // Ordenar las reseñas de más nuevas a más viejas
-        const sortedReviews = result.reviews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        setPosts(sortedReviews); // Actualizar el estado con las reseñas ordenadas
-      } else {
-        Alert.alert('Error', 'No se pudieron cargar las reseñas.');
+        
+        var sortedReviews = result.reviews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        sortedReviews = sortedReviews.map((review) => ({ // Testear, hecho en aeropuerto sin internet
+          ...review,
+          type: 0
+        }));
+        setPosts(sortedReviews); // Esto debería ir al final cuando se tengan los tres tipos de posts
       }
     } catch (error) {
-      console.error('Error al obtener las reseñas:', error);
-      Alert.alert('Error', 'Hubo un problema al cargar las reseñas.');
+      console.error('Error obtaining posts:', error);
     } finally {
-      setLoading(false); // Finaliza la carga
+      setLoading(false); 
     }
   };
-
-  // Función para refrescar cuando el usuario hace "pull-to-refresh"
+  
   const handleRefresh = () => {
-    setRefreshing(true); // Establecer que está refrescando
-    fetchReviews(); // Llamar a la función para obtener las reseñas
-    setRefreshing(false); // Finalizar refresco después de obtener las reseñas
+    setRefreshing(true); 
+    fetchReviews(); 
+    setRefreshing(false); 
   };
 
   useEffect(() => {
-    fetchReviews(); // Llamamos a la función para obtener las reseñas cuando el componente se monta
-  }, []); // Este efecto se ejecuta una sola vez al montar el componente
+    fetchReviews(); 
+  }, []); 
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reseñas de tus Amigos</Text>
+      <Text style={styles.title}>Friend's posts</Text>
       <FlatList
-        data={posts} // Las reseñas que se mostrarán
-        keyExtractor={(item) => item.id.toString()} // Usar el id de cada reseña como key
+        data={posts} 
+        keyExtractor={(item) => item.id.toString()} 
         renderItem={({ item }) => (
           <View style={styles.post}>
-            <Text style={styles.postText}>{item.text}</Text>
+            <Text style={styles.postText}>{item.beer_name}</Text>
+            <Text style={styles.postText}>Review: {item.text}</Text>
             <Text style={styles.postText}>Rating: {item.rating}</Text>
-            <Text style={styles.postText}>Por: {item.user_name}</Text>
+            <Text style={styles.postText}>By: {item.handle}</Text>
           </View>
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>No hay reseñas aún.</Text>}
-        refreshing={refreshing} // Indica si está en proceso de refresco
-        onRefresh={handleRefresh} // Función que se ejecuta cuando el usuario hace pull-to-refresh
+        ListEmptyComponent={<Text style={styles.emptyText}>No posts.</Text>}
+        refreshing={refreshing} 
+        onRefresh={handleRefresh} 
       />
     </View>
   );

@@ -5,7 +5,6 @@ import { API, PORT } from '@env';
 import { jwtDecode } from 'jwt-decode';
 
 
-
 // Estado inicial para el reducer
 const initialState = {
     loading: true,
@@ -44,8 +43,7 @@ const FriendshipRequestsScreen = ({ navigation }) => {
                     'Content-Type': 'application/json',
                 },
             });
-    
-    
+        
             if (response.ok) {
                 fetchRequests(); // Re-fetch friendship requests after acceptance
             } else {
@@ -55,7 +53,6 @@ const FriendshipRequestsScreen = ({ navigation }) => {
             console.error('Error accepting request:', error);
         }
     };
-    
     
     const handleReject = async (requestId, fetchRequests) => {
         try {
