@@ -144,6 +144,8 @@ const EventScreen = ({ route }) => {
     if (selectedFriend && !taggedUsers.includes(selectedFriend)) {
       setTaggedUsers((prev) => [...prev, selectedFriend]);
     }
+    console.log(taggedUsers);
+    
   };
 
   if (loading) {
@@ -169,19 +171,28 @@ const EventScreen = ({ route }) => {
         <View>
           <Text style={styles.sectionTitle}>Add Tagged Friends:</Text>
           <Picker
-            selectedValue={selectedFriend}
-            onValueChange={(itemValue) => setSelectedFriend(itemValue)}
-          >
-            <Picker.Item label="Select a Friend" value={null} />
-            {friends.map((friend) => (
-              <Picker.Item key={friend.id} label={friend.name} value={friend.id} />
-            ))}
-          </Picker>
+        selectedValue={selectedFriend}
+        onValueChange={(itemValue) => setSelectedFriend(itemValue)}
+      >
+        <Picker.Item label="Select a Friend" value={null} />
+        {friends.map((friend) => (
+          <Picker.Item
+            key={friend.id}
+            label={`${friend.first_name} ${friend.last_name}`}
+            value={friend.id}
+          />
+        ))}
+      </Picker>
           <Button title="Add Friend" onPress={handleAddTaggedUser} />
           <Text style={styles.sectionTitle}>Tagged Users:</Text>
-          {taggedUsers.map((id) => (
-            <Text key={id}>{friends.find((f) => f.id === id)?.name || "Unknown User"}</Text>
-          ))}
+          {taggedUsers.map((id) => {
+            const friend = friends.find((f) => f.id === Number(id)); // Convert to number for comparison
+            return (
+              <Text key={id}>
+                {friend ? `${friend.first_name} ${friend.last_name}` : "Unknown User"}
+              </Text>
+            );
+          })}
           <Button
             title="Upload Photo"
             onPress={handleUploadPhoto}
