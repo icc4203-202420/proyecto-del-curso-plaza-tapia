@@ -16,7 +16,8 @@ class API::V1::EventsController < ApplicationController
       {
         id: event_picture.id,
         description: event_picture.description,
-        url: event_picture.photo.attached? ? url_for(event_picture.photo) : nil
+        url: event_picture.photo.attached? ? url_for(event_picture.photo) : nil,
+        tagged_users: event_picture.tagged_users
       }
     end
 
