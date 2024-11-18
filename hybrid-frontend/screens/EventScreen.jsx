@@ -29,6 +29,11 @@ const EventScreen = ({ route }) => {
         const data = await response.json();
         setEvent(data.event);
         setPhotos(data.photos || []);
+        console.log('data.photos:', data.photos);
+        data.photos.forEach((photo, index) => {
+          console.log(`Photo ${index + 1} tagged_users:`, photo.tagged_users);
+        });
+        console.log('Token:', token)
       } catch (error) {
         console.error('Error fetching event details:', error);
       } finally {
@@ -46,7 +51,6 @@ const EventScreen = ({ route }) => {
         });
         const data = await response.json();
         setFriends(data.friends || []);
-        console.log(data.friends);
       } catch (error) {
         console.error('Error fetching friends:', error);
       }
@@ -112,6 +116,11 @@ const EventScreen = ({ route }) => {
     });
     formData.append('event_picture[tagged_users]', JSON.stringify(taggedUsers));
 
+    console.log("Uploading photo with the following data:");
+    console.log("Photo URI:", selectedPhoto.uri);
+    console.log("Tagged Users (JSON):", JSON.stringify(taggedUsers));
+    console.log("FormData contents:", Array.from(formData.entries()));
+
     setIsUploading(true);
     try {
       const response = await fetch(`http://${api}:${port}/api/v1/events/${eventId}/photos`, {
@@ -141,11 +150,9 @@ const EventScreen = ({ route }) => {
   };
 
   const handleAddTaggedUser = () => {
-    if (selectedFriend && !taggedUsers.includes(selectedFriend)) {
-      setTaggedUsers((prev) => [...prev, selectedFriend]);
+    if (selectedFriend && !taggedUsers.includes(Number(selectedFriend))) {
+      setTaggedUsers((prev) => [...prev, Number(selectedFriend)]); // Ensure the ID is stored as an integer
     }
-    console.log(taggedUsers);
-    
   };
 
   if (loading) {
@@ -203,19 +210,24 @@ const EventScreen = ({ route }) => {
 
       <Text style={styles.sectionTitle}>Photos:</Text>
       <FlatList
-        data={photos}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View>
-            <Image source={{ uri: item.url }} style={styles.photo} />
-            {item.tagged_users && item.tagged_users.length > 0 && (
-              <Text style={styles.taggedUsers}>
-                Tagged: {item.tagged_users.map((id) => friends.find((f) => f.id === id)?.name).join(", ")}
-              </Text>
-            )}
-          </View>
-        )}
-      />
+      data={photos}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => (
+        <View>
+          <Image source={{ uri: item.url }} style={styles.photo} />
+          {item.tagged_users && item.tagged_users.length > 0 && (
+            <Text style={styles.taggedUsers}>
+              Tagged: {item.tagged_users
+                .map((id) => {
+                  const friend = friends.find((f) => f.id === id); // Find the friend by ID
+                  return friend ? `${friend.first_name} ${friend.last_name}` : "Unknown User"; // Format name or show 'Unknown User'
+                })
+                .join(", ")} {/* Join names with commas */}
+            </Text>
+          )}
+        </View>
+      )}
+    />
     </View>
   );
 };
