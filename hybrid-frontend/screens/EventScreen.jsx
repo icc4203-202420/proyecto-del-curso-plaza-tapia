@@ -29,6 +29,8 @@ const EventScreen = ({ route }) => {
         const data = await response.json();
         setEvent(data.event);
         setPhotos(data.photos || []);
+        console.log('data:', data)
+        console.log('Token:', token)
       } catch (error) {
         console.error('Error fetching event details:', error);
       } finally {
@@ -46,7 +48,6 @@ const EventScreen = ({ route }) => {
         });
         const data = await response.json();
         setFriends(data.friends || []);
-        console.log(data.friends);
       } catch (error) {
         console.error('Error fetching friends:', error);
       }
@@ -112,6 +113,11 @@ const EventScreen = ({ route }) => {
     });
     formData.append('event_picture[tagged_users]', JSON.stringify(taggedUsers));
 
+    console.log("Uploading photo with the following data:");
+    console.log("Photo URI:", selectedPhoto.uri);
+    console.log("Tagged Users (JSON):", JSON.stringify(taggedUsers));
+    console.log("FormData contents:", Array.from(formData.entries()));
+
     setIsUploading(true);
     try {
       const response = await fetch(`http://${api}:${port}/api/v1/events/${eventId}/photos`, {
@@ -141,11 +147,9 @@ const EventScreen = ({ route }) => {
   };
 
   const handleAddTaggedUser = () => {
-    if (selectedFriend && !taggedUsers.includes(selectedFriend)) {
-      setTaggedUsers((prev) => [...prev, selectedFriend]);
+    if (selectedFriend && !taggedUsers.includes(Number(selectedFriend))) {
+      setTaggedUsers((prev) => [...prev, Number(selectedFriend)]); // Ensure the ID is stored as an integer
     }
-    console.log(taggedUsers);
-    
   };
 
   if (loading) {
