@@ -2,7 +2,7 @@ module API
   module V1
     class EventPicturesController < ApplicationController
       before_action :set_user
-      before_action :set_event
+      before_action :set_event, only: [:create]
 
       def create
         @event_picture = @event.event_pictures.new(event_picture_params.except(:photo))
@@ -28,6 +28,25 @@ module API
         else
           render json: { error: @event_picture.errors.full_messages }, status: :unprocessable_entity
         end
+      end
+
+      def friends_photos
+        friends = @user.friends
+        #Rails.logger.info "Friends: #{friends.pluck(:id)}"
+        photos = EventPicture.where(user: friends).order(created_at: :desc)
+        #Rails.logger.info "Photos: #{photos.pluck(:id)}"
+        photos_complete = photos.map do |photo|
+          #tagged_handles = User.where(id: photo.tagged_users).pluck(:handle)
+          photo.as_json.merge(
+            handle: photo.user.handle,
+            event_name: photo.event.name,
+            bar: photo.event.bar.name,
+            url: url_for(photo.photo),
+            #tagged_handles: tagged_handles
+          )
+        end
+        Rails.logger.info "Sorted photos: #{photos_complete.pluck(:id)}"
+        render json: { photos: photos_complete }, status: :ok
       end
 
       private
