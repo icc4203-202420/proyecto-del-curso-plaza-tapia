@@ -11,4 +11,3 @@ class CreateFriendshipRequests < ActiveRecord::Migration[7.1]
     add_foreign_key :friendship_requests, :users, column: :receiver_id
   end
 end
-

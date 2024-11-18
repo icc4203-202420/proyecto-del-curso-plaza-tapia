@@ -5,7 +5,6 @@ import { API, PORT } from '@env';
 import { jwtDecode } from 'jwt-decode';
 
 
-
 // Estado inicial para el reducer
 const initialState = {
     loading: true,
@@ -31,7 +30,8 @@ const FriendshipRequestsScreen = ({ navigation }) => {
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
-    console.log(`API: ${api}, PORT: ${port}`);
+    // con este console log, se cambia al puerto localhost y deja de funcionar
+    // console.log(`API: ${api}, PORT: ${port}`);
 
     const handleAccept = async (requestId, fetchRequests) => {
         try {
@@ -43,8 +43,7 @@ const FriendshipRequestsScreen = ({ navigation }) => {
                     'Content-Type': 'application/json',
                 },
             });
-    
-    
+        
             if (response.ok) {
                 fetchRequests(); // Re-fetch friendship requests after acceptance
             } else {
@@ -54,7 +53,6 @@ const FriendshipRequestsScreen = ({ navigation }) => {
             console.error('Error accepting request:', error);
         }
     };
-    
     
     const handleReject = async (requestId, fetchRequests) => {
         try {

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Button, Alert, Image, FlatList } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // Ensure the package is installed
 import { API, PORT } from '@env';
+import { jwtDecode } from "jwt-decode";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -9,9 +11,13 @@ const EventScreen = ({ route }) => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [photos, setPhotos] = useState([]);
+  const [friends, setFriends] = useState([]);
+  const [taggedUsers, setTaggedUsers] = useState([]);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [api, setAPI] = useState(API);
   const [port, setPORT] = useState(PORT);
-  console.log(`API: ${api}, PORT: ${port}`);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -22,9 +28,7 @@ const EventScreen = ({ route }) => {
         });
         const data = await response.json();
         setEvent(data.event);
-        setPhotos(data.photos || []); // Supone que el backend devuelve las fotos asociadas al evento
-
-        console.log("Photos data:", data.photos);
+        setPhotos(data.photos || []);
       } catch (error) {
         console.error('Error fetching event details:', error);
       } finally {
@@ -32,7 +36,24 @@ const EventScreen = ({ route }) => {
       }
     };
 
+    const fetchFriends = async () => {
+      try {
+        const token = await AsyncStorage.getItem('jwt');
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.user_id;
+        const response = await fetch(`http://${api}:${port}/api/v1/users/${userId}/friendships`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const data = await response.json();
+        setFriends(data.friends || []);
+        console.log(data.friends);
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+      }
+    };
+
     fetchEventDetails();
+    fetchFriends();
   }, [eventId]);
 
   const handleCheckIn = async () => {
@@ -68,33 +89,30 @@ const EventScreen = ({ route }) => {
       quality: 1,
     });
 
-    // Verifica la estructura del resultado
-    console.log("ImagePicker Result:", result);
-
-    // Asegúrate de que la imagen se seleccionó correctamente y tiene un URI
     if (!result.canceled && result.assets && result.assets.length > 0) {
-        const photo = result.assets[0]; // Accedemos a la primera imagen seleccionada
-        handleUploadPhoto(photo);
+      const photo = result.assets[0];
+      setSelectedPhoto(photo);
     } else {
-        console.log("User cancelled image picker or there was an error.");
+      console.log("User cancelled image picker or there was an error.");
     }
   };
 
-  const handleUploadPhoto = async (photo) => {
+  const handleUploadPhoto = async () => {
+    if (!selectedPhoto) {
+      Alert.alert("Error", "Please select a photo first.");
+      return;
+    }
+
     const token = await AsyncStorage.getItem('jwt');
-
-    console.log("Photo URI:", photo.uri);
-    console.log("Photo Type:", 'image/jpeg');
-    console.log("Photo Name:", 'photo.jpg');
-
-
     const formData = new FormData();
     formData.append('event_picture[photo]', {
-      uri: photo.uri,
+      uri: selectedPhoto.uri,
       type: 'image/jpeg',
       name: 'photo.jpg',
     });
+    formData.append('event_picture[tagged_users]', JSON.stringify(taggedUsers));
 
+    setIsUploading(true);
     try {
       const response = await fetch(`http://${api}:${port}/api/v1/events/${eventId}/photos`, {
         method: 'POST',
@@ -109,13 +127,25 @@ const EventScreen = ({ route }) => {
         Alert.alert("Success", "Photo uploaded successfully!");
         const newPhoto = await response.json();
         setPhotos((prevPhotos) => [...prevPhotos, newPhoto]);
+        setTaggedUsers([]);
+        setSelectedPhoto(null);
       } else {
         Alert.alert("Error", "Failed to upload photo.");
       }
     } catch (error) {
       console.error("Error uploading photo:", error);
       Alert.alert("Error", "An error occurred during photo upload.");
+    } finally {
+      setIsUploading(false);
     }
+  };
+
+  const handleAddTaggedUser = () => {
+    if (selectedFriend && !taggedUsers.includes(selectedFriend)) {
+      setTaggedUsers((prev) => [...prev, selectedFriend]);
+    }
+    console.log(taggedUsers);
+    
   };
 
   if (loading) {
@@ -123,14 +153,6 @@ const EventScreen = ({ route }) => {
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007BFF" />
         <Text>Loading Event Details...</Text>
-      </View>
-    );
-  }
-
-  if (!event) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Error: Event details not found.</Text>
       </View>
     );
   }
@@ -143,15 +165,55 @@ const EventScreen = ({ route }) => {
       <Text style={styles.detail}>Description: {event.description}</Text>
 
       <Button title="Check-in" onPress={handleCheckIn} />
-      <Button title="Upload Photo" onPress={handleSelectPhoto} />
+      <Button title="Select Photo" onPress={handleSelectPhoto} />
 
-      {/* Mostrar las fotos subidas */}
+      {selectedPhoto && (
+        <View>
+          <Text style={styles.sectionTitle}>Add Tagged Friends:</Text>
+          <Picker
+        selectedValue={selectedFriend}
+        onValueChange={(itemValue) => setSelectedFriend(itemValue)}
+      >
+        <Picker.Item label="Select a Friend" value={null} />
+        {friends.map((friend) => (
+          <Picker.Item
+            key={friend.id}
+            label={`${friend.first_name} ${friend.last_name}`}
+            value={friend.id}
+          />
+        ))}
+      </Picker>
+          <Button title="Add Friend" onPress={handleAddTaggedUser} />
+          <Text style={styles.sectionTitle}>Tagged Users:</Text>
+          {taggedUsers.map((id) => {
+            const friend = friends.find((f) => f.id === Number(id)); // Convert to number for comparison
+            return (
+              <Text key={id}>
+                {friend ? `${friend.first_name} ${friend.last_name}` : "Unknown User"}
+              </Text>
+            );
+          })}
+          <Button
+            title="Upload Photo"
+            onPress={handleUploadPhoto}
+            disabled={isUploading}
+          />
+        </View>
+      )}
+
       <Text style={styles.sectionTitle}>Photos:</Text>
       <FlatList
         data={photos}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <Image source={{ uri: item.url }} style={styles.photo} />
+          <View>
+            <Image source={{ uri: item.url }} style={styles.photo} />
+            {item.tagged_users && item.tagged_users.length > 0 && (
+              <Text style={styles.taggedUsers}>
+                Tagged: {item.tagged_users.map((id) => friends.find((f) => f.id === id)?.name).join(", ")}
+              </Text>
+            )}
+          </View>
         )}
       />
     </View>
@@ -168,10 +230,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 18,
-    color: 'red',
   },
   title: {
     fontSize: 28,
@@ -191,10 +249,14 @@ const styles = StyleSheet.create({
   photo: {
     width: '100%',
     height: 200,
-    resizeMode: 'cover',
-    borderWidth: 1,        // Agrega un borde
-    borderColor: '#ccc',   // Color del borde
+    borderWidth: 1,
+    borderColor: '#ccc',
     borderRadius: 10,
+    marginBottom: 10,
+  },
+  taggedUsers: {
+    fontSize: 16,
+    color: '#666',
     marginBottom: 10,
   },
 });

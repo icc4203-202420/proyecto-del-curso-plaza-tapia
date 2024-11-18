@@ -59,8 +59,9 @@ Rails.application.routes.draw do
         end
       end
 
-      # Aquí agregamos la ruta personalizada para obtener las reseñas de los amigos
       get 'friends_reviews', to: 'reviews#friends_reviews'
+      get 'friends_photos', to: 'event_pictures#friends_photos'
+      get 'friends_attendances', to: 'attendances#friends_attendances'
 
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
       resources :attendances, only: [:create] # Route for creating attendance

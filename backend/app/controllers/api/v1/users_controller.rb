@@ -8,7 +8,12 @@ class API::V1::UsersController < ApplicationController
   
   def index
     @users = User.includes(:reviews, :address).where.not(id: @user.id)
-    render json: { users: @users.as_json(include: [:reviews, :address]) }, status: :ok
+    friendship = Friendship.find_by(user_id: @user.id, friend_id: params[:id]).present?
+    render json: {
+      users: @users.as_json(include: [:reviews, :address]),
+      friendship: friendship
+      },
+      status: :ok
   end
 
   def show

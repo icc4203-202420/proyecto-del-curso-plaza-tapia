@@ -50,15 +50,13 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def friends_reviews
-    # Encuentra al usuario actual
-    @user = current_user
-    # Encuentra todos los amigos del usuario
-    friends = @user.friends
-  
-    # Encuentra todas las reseñas hechas por los amigos
-    @reviews = Review.where(user: friends).order(created_at: :desc)
-  
-    render json: { reviews: @reviews }
+    user = current_user
+    friends = user.friends
+    reviews = Review.where(user: friends).order(created_at: :desc)
+    reviews_complete = reviews.map do |review|
+      review.as_json.merge(handle: review.user.handle, beer_name: review.beer.name)
+    end
+    render json: { reviews: reviews_complete }
   end
 
   private
