@@ -29,7 +29,10 @@ const EventScreen = ({ route }) => {
         const data = await response.json();
         setEvent(data.event);
         setPhotos(data.photos || []);
-        console.log('data:', data)
+        console.log('data.photos:', data.photos);
+        data.photos.forEach((photo, index) => {
+          console.log(`Photo ${index + 1} tagged_users:`, photo.tagged_users);
+        });
         console.log('Token:', token)
       } catch (error) {
         console.error('Error fetching event details:', error);
@@ -207,19 +210,24 @@ const EventScreen = ({ route }) => {
 
       <Text style={styles.sectionTitle}>Photos:</Text>
       <FlatList
-        data={photos}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View>
-            <Image source={{ uri: item.url }} style={styles.photo} />
-            {item.tagged_users && item.tagged_users.length > 0 && (
-              <Text style={styles.taggedUsers}>
-                Tagged: {item.tagged_users.map((id) => friends.find((f) => f.id === id)?.name).join(", ")}
-              </Text>
-            )}
-          </View>
-        )}
-      />
+      data={photos}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => (
+        <View>
+          <Image source={{ uri: item.url }} style={styles.photo} />
+          {item.tagged_users && item.tagged_users.length > 0 && (
+            <Text style={styles.taggedUsers}>
+              Tagged: {item.tagged_users
+                .map((id) => {
+                  const friend = friends.find((f) => f.id === id); // Find the friend by ID
+                  return friend ? `${friend.first_name} ${friend.last_name}` : "Unknown User"; // Format name or show 'Unknown User'
+                })
+                .join(", ")} {/* Join names with commas */}
+            </Text>
+          )}
+        </View>
+      )}
+    />
     </View>
   );
 };
