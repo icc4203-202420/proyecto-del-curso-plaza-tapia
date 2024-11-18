@@ -22,7 +22,11 @@ class API::V1::AttendancesController < ApplicationController
     def friends_attendances
       friends = @user.friends
       Rails.logger.info "Friends: #{friends.pluck(:id)}"
-      attendances = Attendance.where(user: friends).order(created_at: :desc)
+
+      attendances = Attendance.includes(event: { bar: :address })
+                          .where(user: friends)
+                          .order(created_at: :desc)
+
       Rails.logger.info "Attendances: #{attendances.pluck(:id)}"
       attendances_complete = attendances.map do |attendance|
         attendance.as_json.merge(
@@ -30,6 +34,7 @@ class API::V1::AttendancesController < ApplicationController
           handle: attendance.user.handle,
           event_name: attendance.event.name,
           bar: attendance.event.bar.name,
+          country: attendance.event.bar.address.country.name,
         )
         end
       Rails.logger.info "Sorted attendances: #{attendances_complete.pluck(:id)}"

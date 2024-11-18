@@ -29,6 +29,7 @@ const FeedScreen = () => {
         },
       });
       const reviewsResult = await reviewsResponse.json();
+      console.log("REVIEWS: ", reviewsResult);
       if (reviewsResponse.ok) {
         sortedReviews = reviewsResult.reviews
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -39,10 +40,11 @@ const FeedScreen = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, 
+          'Authorization': `Bearer ${token}`,   
         },
       });
       const photosResult = await photosResponse.json();
+      console.log("PHOTOS: ", photosResult);
       if (photosResponse.ok) {
         sortedPhotos = photosResult.photos
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -57,8 +59,7 @@ const FeedScreen = () => {
         },
       });
       const attendancesResult = await attendancesResponse.json();
-      console.log("attendancesResponse: ", attendancesResponse);
-      console.log("attendanceResult: ", attendancesResult);
+      console.log("ATTENDANCES: ", attendancesResult);
       var sortedAttendances = [];
       if (attendancesResponse.ok) {
         sortedAttendances = attendancesResult.attendances
