@@ -23,9 +23,9 @@ const reducer = (state, action) => {
             return state;
     }
 };
-
+ 
 const ReviewsScreen = ({ route }) => {
-    const { beerId } = route.params;
+    const { beerId, beerName } = route.params;
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
@@ -82,6 +82,7 @@ const ReviewsScreen = ({ route }) => {
 
     return (
         <ScrollView style={styles.container}>
+            <Text style={styles.beerName}>{beerName} Reviews</Text>
             {reviews.length > 0 ? (
                 reviews.map((review) => (
                     <View key={review.id} style={styles.reviewContainer}>
@@ -97,6 +98,13 @@ const ReviewsScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+    beerName: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+        color: '#333',
+    },
     container: {
         flex: 1,
         padding: 20,

@@ -58,7 +58,7 @@ const BeersScreen = ({ navigation }) => {
                 data={filteredBeers}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('Beer', { beerId: item.id })} >
+                    <TouchableOpacity onPress={() => navigation.navigate('Beer', { beerId: item.id, beerName: item.name })} >
                         <View style={styles.beerItem}>
                             <Text style={styles.beerName}>{item.name}</Text>
                             <Text>{item.description}</Text>

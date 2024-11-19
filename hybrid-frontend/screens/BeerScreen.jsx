@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button } from 'r
 import { API, PORT } from '@env';
 
 const BeerScreen = ({ route, navigation }) => {
-  const { beerId } = route.params;
+  const { beerId, beerName } = route.params;
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
   const [brewery, setBrewery] = useState(null);
@@ -88,10 +88,10 @@ const BeerScreen = ({ route, navigation }) => {
         )}
       </View>
       {!userReviewExists && (
-        <Button title="Write your review" onPress={() => navigation.navigate('Review', { beerId })} />
+        <Button title="Write your review" onPress={() => navigation.navigate('Review', { beerId, beerName })} />
       )}
       <View style={styles.centeredContainer}>
-        <Button title="See reviews" onPress={() => navigation.navigate('Reviews', { beerId })} />
+        <Button title="See reviews" onPress={() => navigation.navigate('Reviews', { beerId, beerName })} />
       </View>
       <View style={styles.detailsContainer}>
         <View style={styles.detailsSubContainer}>

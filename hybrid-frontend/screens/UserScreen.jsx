@@ -22,7 +22,7 @@ const reducer = (state, action) => {
     }
 };
 
-const UserScreen = ({ route }) => {
+const UserScreen = ({ route, navigation }) => {
     const { userId } = route.params; // Obtener el ID del usuario desde los parámetros de navegación
     const [state, dispatch] = useReducer(reducer, initialState);
     const [friendRequestSent, setFriendRequestSent] = useState(false); // Estado para la solicitud de amistad
@@ -141,10 +141,13 @@ const UserScreen = ({ route }) => {
                     data={user.reviews}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <View style={styles.reviewContainer}>
+                        <TouchableOpacity
+                            style={styles.reviewContainer}
+                            onPress={() => navigation.navigate('Beer', { beerId: item.beer_id, beerName: item.beer_name })}
+                        >
                             <Text style={styles.reviewText}>{item.text}</Text>
                             <Text style={styles.reviewRating}>Rating: {item.rating}</Text>
-                        </View>
+                        </TouchableOpacity>
                     )}
                 />
             )}
