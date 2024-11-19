@@ -22,7 +22,18 @@ class API::V1::UsersController < ApplicationController
   end
 
   def create
+    if user_params.dig(:address_attributes, :country_name)
+      country = Country.find_or_create_by(name: user_params[:address_attributes][:country_name])
+      if country
+        params[:user][:address_attributes][:country_id] = country.id
+      else
+        return render json: { error: "Invalid country name" }, status: :unprocessable_entity
+      end
+      params[:user][:address_attributes].delete(:country_name)
+    end
+  
     @user = User.new(user_params)
+  
     if @user.save
       render json: @user.id, status: :ok
     else
@@ -75,11 +86,9 @@ class API::V1::UsersController < ApplicationController
   end
 
   def user_params
-    params.fetch(:user, {}).
-        permit(:id, :first_name, :last_name, :email, :age,
-            { address_attributes: [:id, :line1, :line2, :city, :country, :country_id, 
-              country_attributes: [:id, :name]],
-              reviews_attributes: [:id, :text, :rating, :beer_id, :_destroy]
-            })
+    params.require(:user).permit(
+      :first_name, :last_name, :email, :handle, :password, :password_confirmation,
+      address_attributes: [:line1, :line2, :city, :country_name]
+    )
   end
 end
