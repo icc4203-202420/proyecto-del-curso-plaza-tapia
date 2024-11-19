@@ -1,12 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
-import { Keyboard } from 'react-native';
-import { Slider } from '@rneui/themed';
+import { View, TextInput, Button, StyleSheet, Text, Alert, Keyboard } from 'react-native';
+import Slider from '@react-native-community/slider'; // Use community slider for better compatibility
 import { API, PORT } from '@env';
 
 const ReviewScreen = ({ route, navigation }) => {
-    const { beerId } = route.params;
+    const { beerId, beerName } = route.params;
     const [reviewText, setReviewText] = useState('');
     const [rating, setRating] = useState(1);
     const [api, setAPI] = useState(API);
@@ -28,7 +27,6 @@ const ReviewScreen = ({ route, navigation }) => {
         };
 
         try {
-
             const token = await AsyncStorage.getItem('jwt');
             const response = await fetch(`http://${api}:${port}/api/v1/reviews`, {
                 method: 'POST',
@@ -43,7 +41,6 @@ const ReviewScreen = ({ route, navigation }) => {
 
             if (response.ok) {
                 Alert.alert('Success', 'Review submitted successfully');
-                // Navega de vuelta a otra pantalla si es necesario
                 navigation.goBack({ refresh: true });
             } else {
                 Alert.alert('Error', `Failed to submit review: ${result.message || 'Unknown error'}`);
@@ -56,8 +53,8 @@ const ReviewScreen = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Review for Beer ID: {beerId}</Text>
-            {/* Caja de texto para la reseña */}
+            <Text style={styles.title}>Review for {beerName}</Text>
+            {/* Text input for review */}
             <TextInput
                 style={styles.input}
                 placeholder="Write your review here"
@@ -68,22 +65,21 @@ const ReviewScreen = ({ route, navigation }) => {
                 blurOnSubmit={true}
             />
 
-            {/* Slider para el rating */}
+            {/* Slider for rating */}
             <Text style={styles.subHeader}>Rate this beer: {rating.toFixed(1)}</Text>
             <Slider
-        value={rating}
-        onValueChange={setRating} // Directly set the state without `.toFixed`
-        minimumValue={1}
-        maximumValue={5}
-        step={0.1} // Allows precise steps if floats are supported
-        thumbTintColor="#1462DB"
-        minimumTrackTintColor="#1462DB"
-        maximumTrackTintColor="#ccc"
-        style={styles.slider}
-    />
+                value={rating}
+                onValueChange={setRating}
+                minimumValue={1}
+                maximumValue={5}
+                step={0.1}
+                thumbTintColor="#1462DB"
+                minimumTrackTintColor="#1462DB"
+                maximumTrackTintColor="#ccc"
+                style={styles.slider}
+            />
 
-
-            {/* Botón para enviar la reseña */}
+            {/* Button to submit review */}
             <Button title="Submit Review" onPress={handleSubmitReview} />
         </View>
     );
