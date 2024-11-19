@@ -12,13 +12,16 @@ const RegisterScreen = ({ navigation }) => {
   const [handle, setHandle] = useState('');
   const [password, setPassword] = useState('');
   const [password_confirmation, setPasswordConfirmation] = useState('');
+  const [line1, setLine1] = useState('');
+  const [line2, setLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [country_name, setCountryName] = useState('');
   const [api, setAPI] = useState(API);
   const [port, setPORT] = useState(PORT);
 
   console.log(`API: ${api}, PORT: ${port}`);
 
   const handleRegister = async () => {
-    
     try {
       const response = await fetch(`http://${api}:${port}/api/v1/signup`, {
         method: 'POST',
@@ -32,7 +35,13 @@ const RegisterScreen = ({ navigation }) => {
             last_name,
             handle,
             password,
-            password_confirmation
+            password_confirmation,
+            address_attributes: {
+              line1,
+              line2,
+              city,
+              country_name, // Send country name to the backend
+            },
           },
         }),
       });
@@ -52,7 +61,7 @@ const RegisterScreen = ({ navigation }) => {
         body: JSON.stringify({
           user: {
             email,
-            password
+            password,
           },
         }),
       });
@@ -70,10 +79,9 @@ const RegisterScreen = ({ navigation }) => {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: 'Home' }]
+          routes: [{ name: 'Home' }],
         })
       );
-
     } catch (error) {
       Alert.alert('Error at register', error.message);
       setPassword('');
@@ -122,6 +130,33 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={setPasswordConfirmation}
         secureTextEntry
       />
+
+      {/* Address Fields */}
+      <TextInput
+        style={styles.input}
+        placeholder="Address Line 1"
+        value={line1}
+        onChangeText={setLine1}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Address Line 2"
+        value={line2}
+        onChangeText={setLine2}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="City"
+        value={city}
+        onChangeText={setCity}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Country Name"
+        value={country_name}
+        onChangeText={setCountryName}
+      />
+
       <Button title="Register" onPress={handleRegister} />
       <Button
         title="Login"
@@ -130,7 +165,7 @@ const RegisterScreen = ({ navigation }) => {
       <StatusBar style="auto" />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
