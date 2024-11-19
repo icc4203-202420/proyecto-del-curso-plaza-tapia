@@ -19,8 +19,20 @@ const EventScreen = ({ route }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [api, setAPI] = useState(API);
   const [port, setPORT] = useState(PORT);
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
 
   useEffect(() => {
+
+    const formatDateTime = (dateTime) => {
+      const [date, time] = dateTime.split('T'); // Separate date and time
+      const [hour, minute] = time.split(':'); // Extract hour and minute
+      const hour12 = hour % 12 || 12; // Convert to 12-hour format
+      const ampm = hour >= 12 ? 'PM' : 'AM'; // Determine AM/PM
+      const formattedTime = `${hour12}:${minute} ${ampm}`; // Format time
+      return { date, time: formattedTime };
+    };
+
     const fetchEventDetails = async () => {
       try {
         const token = await AsyncStorage.getItem('jwt');
@@ -30,11 +42,9 @@ const EventScreen = ({ route }) => {
         const data = await response.json();
         setEvent(data.event);
         setPhotos(data.photos || []);
-        console.log('data.photos:', data.photos);
-        data.photos.forEach((photo, index) => {
-          console.log(`Photo ${index + 1} tagged_users:`, photo.tagged_users);
-        });
-        console.log('Token:', token)
+        const { date, time } = formatDateTime(data.event.date);
+        setDate(date);
+        setTime(time);
       } catch (error) {
         console.error('Error fetching event details:', error);
       } finally {
@@ -117,11 +127,6 @@ const EventScreen = ({ route }) => {
     });
     formData.append('event_picture[tagged_users]', JSON.stringify(taggedUsers));
 
-    console.log("Uploading photo with the following data:");
-    console.log("Photo URI:", selectedPhoto.uri);
-    console.log("Tagged Users (JSON):", JSON.stringify(taggedUsers));
-    console.log("FormData contents:", Array.from(formData.entries()));
-
     setIsUploading(true);
     try {
       const response = await fetch(`http://${api}:${port}/api/v1/events/${eventId}/photos`, {
@@ -177,8 +182,8 @@ const EventScreen = ({ route }) => {
       </View>
       <View style={styles.container}>
         <Text style={styles.title}>{event.name}</Text>
-        <Text style={styles.detail}>Date: {event.date}</Text>
-        <Text style={styles.detail}>Location: {event.location}</Text>
+        <Text style={styles.detail}>Date: {date}</Text>
+        <Text style={styles.detail}>Time: {time}</Text>
         <Text style={styles.detail}>Description: {event.description}</Text>
 
         <Button title="Check-in" onPress={handleCheckIn} />

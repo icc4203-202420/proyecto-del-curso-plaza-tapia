@@ -75,7 +75,7 @@ const BarScreen = ({ route, navigation }) => {
           <Text style={styles.detail}>📍 {bar.country}, {bar.city}, {bar.line1}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Upcoming Events</Text>
+        <Text style={styles.sectionTitle}>Events</Text>
         <FlatList
           data={events}
           keyExtractor={(item) => item.id.toString()}

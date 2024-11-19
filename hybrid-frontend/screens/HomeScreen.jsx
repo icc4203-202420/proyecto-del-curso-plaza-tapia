@@ -50,7 +50,6 @@ const HomeScreen = ({ navigation }) => {
         },
       });
       const reviewsResult = await reviewsResponse.json();
-      console.log("REVIEWS: ", reviewsResult);
       if (reviewsResponse.ok) {
         sortedReviews = reviewsResult.reviews
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -65,7 +64,6 @@ const HomeScreen = ({ navigation }) => {
         },
       });
       const photosResult = await photosResponse.json();
-      console.log("PHOTOS: ", photosResult);
       if (photosResponse.ok) {
         sortedPhotos = photosResult.photos
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -80,7 +78,6 @@ const HomeScreen = ({ navigation }) => {
         },
       });
       const attendancesResult = await attendancesResponse.json();
-      console.log("ATTENDANCES: ", attendancesResult);
       sortedAttendances = [];
       if (attendancesResponse.ok) {
         sortedAttendances = attendancesResult.attendances
@@ -90,14 +87,12 @@ const HomeScreen = ({ navigation }) => {
       else {
         console.log("attendanceResponse.ok", attendancesResponse.ok);
       }
-      console.log("sortedAttendances: ", sortedAttendances);
 
       const combinedData = [...sortedReviews, ...sortedPhotos, ...sortedAttendances].sort(
         (a, b) => new Date(b.created_at) - new Date(a.created_at)
       );
 
       setPosts(combinedData);
-      console.log("THESE POSTS: ", combinedData);
       setFilteredPosts(combinedData);
 
     } catch (error) {
@@ -110,40 +105,30 @@ const HomeScreen = ({ navigation }) => {
   
 
   const applyFilters = () => {
-    console.log("Applying filters...");
-    console.log("Original posts:", posts);
-    console.log("Current Filters:", { postType, selectedFriend, selectedBeer, selectedBar, selectedCountry });
-  
     let filtered = [...posts]; // Clone the posts array
   
     if (postType !== null) {
       const postTypeInt = parseInt(postType, 10); // Convert postType to integer
       filtered = filtered.filter((post) => post.type === postTypeInt);
-      console.log("After filtering by postType:", filtered);
     }
   
     if (selectedFriend) {
       filtered = filtered.filter((post) => post.handle === selectedFriend);
-      console.log("After filtering by selectedFriend:", filtered);
     }
   
     if (selectedBeer) {
       filtered = filtered.filter((post) => post.beer_name === selectedBeer);
-      console.log("After filtering by selectedBeer:", filtered);
     }
   
     if (selectedBar) {
       filtered = filtered.filter((post) => post.bar === selectedBar);
-      console.log("After filtering by selectedBar:", filtered);
     }
   
     if (selectedCountry) {
       filtered = filtered.filter((post) => post.country === selectedCountry);
-      console.log("After filtering by selectedCountry:", filtered);
     }
   
     setFilteredPosts(filtered);
-    console.log("Filtered posts ready for display:", filtered);
   };
   
   const handleRefresh = () => {
@@ -311,9 +296,10 @@ const HomeScreen = ({ navigation }) => {
                   >
                     <View style={styles.post}>
                       <Text style={styles.postText}>
-                        {item.handle} confirmed attendance to {item.event_name}
+                        <Text style={{ fontWeight: 'bold' }}>{item.handle}</Text> confirmed attendance to
+                        <Text style={{ fontWeight: 'bold' }}> {item.event_name}</Text> at
+                        <Text style={{ fontWeight: 'bold' }}> {item.bar}</Text>
                       </Text>
-                      <Text style={styles.postText}>Bar: {item.bar}</Text>
                     </View>
                   </TouchableOpacity>
                 );
