@@ -42,11 +42,13 @@ module API
         #Rails.logger.info "Photos: #{photos.pluck(:id)}"
         photos_complete = photos.map do |photo|
           #tagged_handles = User.where(id: photo.tagged_users).pluck(:handle)
+          country_name = photo.event.bar.address&.country&.name || "Unknown"
           photo.as_json.merge(
             handle: photo.user.handle,
             event_name: photo.event.name,
             bar: photo.event.bar.name,
             url: url_for(photo.photo),
+            country: country_name,
             #tagged_handles: tagged_handles
           )
         end
