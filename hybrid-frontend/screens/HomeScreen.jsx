@@ -1,119 +1,222 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Alert, Image, FlatList, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DropdownMenu from '../utils/DropdownMenu';
+import { API, PORT } from '@env';
 
-const HomeScreen = () => {
-    const navigation = useNavigation();
+const HomeScreen = ({ navigation }) => {
 
-    // Función para navegar a la pantalla de perfil del usuario
-    const goToProfile = () => {
-        navigation.navigate('Profile'); // Asegúrate de que la pantalla de perfil esté registrada en tu configuración de navegación
+    const [posts, setPosts] = useState([]); 
+    const [loading, setLoading] = useState(true); 
+    const [refreshing, setRefreshing] = useState(false); 
+    const [api, setAPI] = useState(API); 
+    const [port, setPORT] = useState(PORT); 
+
+    const fetchPosts = async () => {
+        setLoading(true);
+        try {
+        
+        const token = await AsyncStorage.getItem('jwt');
+        if (!token) {
+            Alert.alert('Error', 'Authentication token not found.');
+            return;
+        }
+
+        const reviewsResponse = await fetch(`http://${api}:${port}/api/v1/friends_reviews`, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, 
+            },
+        });
+        const reviewsResult = await reviewsResponse.json();
+        var sortedReviews = [];
+        if (reviewsResponse.ok) {
+            sortedReviews = reviewsResult.reviews
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .map((review) => ({ ...review, type: 0 })); // Add a "type" to identify reviews
+        }
+
+        const photosResponse = await fetch(`http://${api}:${port}/api/v1/friends_photos`, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, 
+            },
+        });
+        const photosResult = await photosResponse.json();
+        var sortedPhotos = [];
+        if (photosResponse.ok) {
+            sortedPhotos = photosResult.photos
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .map((photo) => ({ ...photo, type: 1 }));
+        }
+
+        const attendancesResponse = await fetch(`http://${api}:${port}/api/v1/friends_attendances`, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, 
+            },
+        });
+        const attendancesResult = await attendancesResponse.json();
+        console.log("attendancesResponse: ", attendancesResponse);
+        console.log("attendanceResult: ", attendancesResult);
+        var sortedAttendances = [];
+        if (attendancesResponse.ok) {
+            sortedAttendances = attendancesResult.attendances
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .map((attendance) => ({ ...attendance, type: 2 }));
+        }
+        else {
+            console.log("attendanceResponse.ok", attendancesResponse.ok);
+        }
+        console.log("sortedAttendances: ", sortedAttendances);
+
+        const combinedData = [...sortedReviews, ...sortedPhotos, ...sortedAttendances].sort(
+            (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+
+        setPosts(combinedData);
+
+        } catch (error) {
+        console.error('Error obtaining posts:', error);
+        } finally {
+        setLoading(false); 
+        }
     };
 
-    // Funciones para navegar a cada tipo de búsqueda específica
-    const goToSearch = (category) => {
-        navigation.navigate('SearchScreen', { category }); // Enviar la categoría a la pantalla de búsqueda
+    const handleRefresh = () => {
+        setRefreshing(true); 
+        fetchPosts(); 
+        setRefreshing(false); 
     };
+
+    useEffect(() => {
+        fetchPosts(); 
+    }, []); 
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            {/* Título de la pantalla */}
-            <Text style={styles.title}>Beer Finder</Text>
-
-            {/* Botón para acceder al perfil */}
-            <TouchableOpacity style={styles.profileButton} onPress={goToProfile}>
-                <Icon name="person-circle-outline" size={30} color="#fff" />
-                <Text style={styles.buttonText}>Go to Profile</Text>
-            </TouchableOpacity>
-
-            {/* Opciones de búsqueda por categoría */}
-            <Text style={styles.sectionTitle}>Search Categories</Text>
-            <View style={styles.categoryContainer}>
-                <TouchableOpacity style={styles.categoryButton} onPress={() => navigation.navigate('Bars')}>
-                    <Icon name="location-outline" size={30} color="#0d9fff" />
-                    <Text style={styles.categoryText}>Bars</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.categoryButton} onPress={() => navigation.navigate('Beers')}>
-                    <Icon name="beer-outline" size={30} color="#ff9800" />
-                    <Text style={styles.categoryText}>Beers</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.categoryButton} onPress={() => navigation.navigate('Users')}>
-                    <Icon name="people-outline" size={30} color="#4caf50" />
-                    <Text style={styles.categoryText}>Users</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.categoryButton} onPress={() => navigation.navigate('Friends')}>
-                    <Icon name="heart-outline" size={30} color="#e91e63" />
-                    <Text style={styles.categoryText}>Friends</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.categoryButton} onPress={() => navigation.navigate('Feed')}>
-                    <Icon name="car-outline" size={30} color="gray" />
-                    <Text style={styles.categoryText}>Feed</Text>
-                </TouchableOpacity>
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
             </View>
-        </ScrollView>
+            <View style={styles.container}>
+                <Text style={styles.title}>Feed</Text>
+                <FlatList
+                data={posts} 
+                keyExtractor={(item) => item.id.toString()} 
+                renderItem={({ item }) => {
+                    if (item.type === 0) {
+                    return (
+                        <TouchableOpacity
+                        style={styles.post}
+                        onPress={() => navigation.navigate('Beer', { beerId: item.beer_id })}
+                        >
+                        <View style={styles.post}>
+                            <Text style={styles.postText}>Beer: {item.beer_name}</Text>
+                            <Text style={styles.postText}>Review: {item.text}</Text>
+                            <Text style={styles.postText}>Rating: {item.rating}</Text>
+                            <Text style={styles.postText}>By: {item.handle}</Text>
+                        </View>
+                        </TouchableOpacity>
+                    );
+                    }
+                    else if (item.type === 1) {
+                    return (
+                        <TouchableOpacity
+                        style={styles.post}
+                        onPress={() => navigation.navigate('Event', { eventId: item.event_id })}
+                        >
+                        <View style={styles.post}>
+                            <Text style={styles.postText}>Event: {item.event_name}</Text>
+                            <Text style={styles.postText}>Bar: {item.bar}</Text>
+                            <Text style={styles.postText}>By: {item.handle}</Text>
+                            <Image source={{ uri: item.url }} style={styles.image} />
+                        </View>
+                        </TouchableOpacity>
+                    );
+                    }
+                    else if (item.type === 2) {
+                    return (
+                        <TouchableOpacity
+                        style={styles.post}
+                        onPress={() => navigation.navigate('Event', { eventId: item.event_id })}
+                        >
+                        <View style={styles.post}>
+                            <Text style={styles.postText}>{item.handle} confirmed attendance to {item.event_name}</Text>
+                            <Text style={styles.postText}>Bar: {item.bar}</Text>
+                        </View>
+                        </TouchableOpacity>
+                    );
+                    }
+                }}
+                ListEmptyComponent={<Text style={styles.emptyText}>No posts.</Text>}
+                refreshing={refreshing} 
+                onRefresh={handleRefresh} 
+                />
+            </View>
+        </>
     );
-};
+    };
 
 const styles = StyleSheet.create({
+    image: {
+      width: '100%',
+      height: 200,
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 10,
+      marginBottom: 10,
+    },
+    container1: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f3f3f3',
+      maxHeight: 0,
+    },
     container: {
-        flexGrow: 1,
-        padding: 20,
-        backgroundColor: '#f3f3f3',
-        alignItems: 'center',
+      flex: 1,
+      padding: 20,
+      backgroundColor: '#fff',
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
     },
     title: {
-        fontSize: 26,
-        fontWeight: 'bold',
-        color: '#333',
-        marginVertical: 20,
+      fontSize: 24,
+      fontWeight: 'bold',
+      height: '7%',
+      alignSelf: 'center',
+      justifyContent: 'center',
     },
-    profileButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#007bff',
-        padding: 15,
-        borderRadius: 10,
-        width: '100%',
-        marginBottom: 20,
-        justifyContent: 'center',
+    post: {
+      marginBottom: 10,
+      padding: 10,
+      backgroundColor: '#f9f9f9',
+      borderRadius: 8,
     },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        marginLeft: 10,
+    postText: {
+      fontSize: 16,
+      color: '#333',
     },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#333',
-        alignSelf: 'flex-start',
-        marginBottom: 10,
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
-    categoryContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        width: '100%',
+    loadingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: '#555',
     },
-    categoryButton: {
-        alignItems: 'center',
-        width: '48%',
-        padding: 20,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        marginVertical: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.41,
-        elevation: 2,
+    emptyText: {
+      fontSize: 16,
+      color: '#777',
+      textAlign: 'center',
+      marginTop: 20,
     },
-    categoryText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#333',
-    },
-});
+  });
 
 export default HomeScreen;

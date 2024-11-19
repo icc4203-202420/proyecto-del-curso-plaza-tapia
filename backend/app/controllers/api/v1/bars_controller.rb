@@ -18,7 +18,11 @@ class API::V1::BarsController < ApplicationController
         thumbnail_url: url_for(@bar.thumbnail) }),
         status: :ok
     else
-      render json: { bar: @bar.as_json }, status: :ok
+      render json: { bar: @bar.as_json.merge(
+        country: @bar.address.country.name,
+        city: @bar.address.city,
+        line1: @bar.address.line1,
+      ) }, status: :ok
     end
   end
 

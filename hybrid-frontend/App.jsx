@@ -3,9 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, TouchableOpacity } from 'react-native';
-import React, { useState }  from 'react';
+import React from 'react';
 import { NotificationProvider } from './utils/NotificationContext';
-import { API, PORT } from '@env';
 
 import FriendshipRequestsScreen from './screens/FriendshipRequestsScreen';
 import RegisterScreen from './screens/RegisterScreen';

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Alert, Image, FlatList, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
-import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
 
-const FeedScreen = () => {
+const FeedScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]); 
   const [loading, setLoading] = useState(true); 
   const [refreshing, setRefreshing] = useState(false); 
@@ -102,30 +102,45 @@ const FeedScreen = () => {
         renderItem={({ item }) => {
           if (item.type === 0) {
             return (
-              <View style={styles.post}>
-                <Text style={styles.postText}>Beer: {item.beer_name}</Text>
-                <Text style={styles.postText}>Review: {item.text}</Text>
-                <Text style={styles.postText}>Rating: {item.rating}</Text>
-                <Text style={styles.postText}>By: {item.handle}</Text>
-              </View>
+              <TouchableOpacity
+                style={styles.post}
+                onPress={() => navigation.navigate('Beer', { beerId: item.beer_id })}
+              >
+                <View style={styles.post}>
+                  <Text style={styles.postText}>Beer: {item.beer_name}</Text>
+                  <Text style={styles.postText}>Review: {item.text}</Text>
+                  <Text style={styles.postText}>Rating: {item.rating}</Text>
+                  <Text style={styles.postText}>By: {item.handle}</Text>
+                </View>
+              </TouchableOpacity>
             );
           }
           else if (item.type === 1) {
             return (
-              <View style={styles.post}>
-                <Text style={styles.postText}>Event: {item.event_name}</Text>
-                <Text style={styles.postText}>Bar: {item.bar}</Text>
-                <Text style={styles.postText}>By: {item.handle}</Text>
-                <Image source={{ uri: item.url }} style={styles.image} />
-              </View>
+              <TouchableOpacity
+                style={styles.post}
+                onPress={() => navigation.navigate('Event', { eventId: item.event_id })}
+              >
+                <View style={styles.post}>
+                  <Text style={styles.postText}>Event: {item.event_name}</Text>
+                  <Text style={styles.postText}>Bar: {item.bar}</Text>
+                  <Text style={styles.postText}>By: {item.handle}</Text>
+                  <Image source={{ uri: item.url }} style={styles.image} />
+                </View>
+              </TouchableOpacity>
             );
           }
           else if (item.type === 2) {
             return (
-              <View style={styles.post}>
-                <Text style={styles.postText}>{item.handle} confirmed attendance to {item.event_name}</Text>
-                <Text style={styles.postText}>Bar: {item.bar}</Text>
-              </View>
+              <TouchableOpacity
+                style={styles.post}
+                onPress={() => navigation.navigate('Event', { eventId: item.event_id })}
+              >
+                <View style={styles.post}>
+                  <Text style={styles.postText}>{item.handle} confirmed attendance to {item.event_name}</Text>
+                  <Text style={styles.postText}>Bar: {item.bar}</Text>
+                </View>
+              </TouchableOpacity>
             );
           }
         }}
@@ -145,6 +160,12 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 10,
     marginBottom: 10,
+  },
+  container1: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f3f3f3',
   },
   container: {
     flex: 1,

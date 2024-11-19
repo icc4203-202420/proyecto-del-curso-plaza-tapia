@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, ActivityIndicator, TextInput, FlatList, Touchab
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
 import { jwtDecode } from "jwt-decode";
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import { useFocusEffect } from '@react-navigation/native';
+import DropdownMenu from '../utils/DropdownMenu';
 
 // Estado inicial para el reducer
 const initialState = {
@@ -98,37 +99,47 @@ const FriendsScreen = ({ navigation }) => {
 
     if (error) {
         return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            </>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Search for Friends</Text>
-            <TouchableOpacity style={styles.requestButton} onPress={() => navigation.navigate('FriendshipRequests')}>
-                <Text style={styles.requestButtonText}>View Friendship Requests</Text>
-            </TouchableOpacity>
-            <TextInput
-                style={styles.input}
-                placeholder="Type friend's handle"
-                value={query}
-                onChangeText={setQuery}
-            />
-            <FlatList
-                data={filteredFriends}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('User', { userId: item.id })}>
-                        <View style={styles.friendContainer}>
-                            <Text style={styles.friendName}>{item.handle}</Text>
-                        </View>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={<Text style={styles.noFriendsText}>No friends available</Text>}
-            />
-        </View>
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.title}>Search for Friends</Text>
+                <TouchableOpacity style={styles.requestButton} onPress={() => navigation.navigate('FriendshipRequests')}>
+                    <Text style={styles.requestButtonText}>View Friendship Requests</Text>
+                </TouchableOpacity>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Type friend's handle"
+                    value={query}
+                    onChangeText={setQuery}
+                />
+                <FlatList
+                    data={filteredFriends}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => navigation.navigate('User', { userId: item.id })}>
+                            <View style={styles.friendContainer}>
+                                <Text style={styles.friendName}>{item.handle}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                    ListEmptyComponent={<Text style={styles.noFriendsText}>No friends available</Text>}
+                />
+            </View>
+        </>
     );
 };
 

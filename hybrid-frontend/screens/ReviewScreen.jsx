@@ -4,6 +4,7 @@ import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
 import { Keyboard } from 'react-native';
 import { Slider } from '@rneui/themed';
 import { API, PORT } from '@env';
+import DropdownMenu from '../utils/DropdownMenu';
 
 const ReviewScreen = ({ route, navigation }) => {
     const { beerId } = route.params;
@@ -55,36 +56,41 @@ const ReviewScreen = ({ route, navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Review for Beer ID: {beerId}</Text>
-            {/* Caja de texto para la reseña */}
-            <TextInput
-                style={styles.input}
-                placeholder="Write your review here"
-                value={reviewText}
-                onChangeText={setReviewText}
-                multiline
-                onSubmitEditing={() => Keyboard.dismiss()}
-                blurOnSubmit={true}
-            />
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.title}>Review for Beer ID: {beerId}</Text>
+                {/* Caja de texto para la reseña */}
+                <TextInput
+                    style={styles.input}
+                    placeholder="Write your review here"
+                    value={reviewText}
+                    onChangeText={setReviewText}
+                    multiline
+                    onSubmitEditing={() => Keyboard.dismiss()}
+                    blurOnSubmit={true}
+                />
 
-            {/* Slider para el rating */}
-            <Text style={styles.subHeader}>Rate this beer: {rating.toFixed(1)}</Text>
-            <Slider
-                value={rating}
-                onValueChange={setRating}  // Actualiza el estado con el valor del slider
-                minimumValue={1}  // Valor mínimo
-                maximumValue={5}  // Valor máximo
-                thumbTintColor="#1462DB"  // Color del 'thumb' (dorado)
-                minimumTrackTintColor="#1462DB"  // Color de la pista izquierda
-                maximumTrackTintColor="#ccc"  // Color de la pista derecha
-                style={styles.slider}  // Estilo del slider
-            />
+                {/* Slider para el rating */}
+                <Text style={styles.subHeader}>Rate this beer: {rating.toFixed(1)}</Text>
+                <Slider
+                    value={rating}
+                    onValueChange={setRating}  // Actualiza el estado con el valor del slider
+                    minimumValue={1}  // Valor mínimo
+                    maximumValue={5}  // Valor máximo
+                    thumbTintColor="#1462DB"  // Color del 'thumb' (dorado)
+                    minimumTrackTintColor="#1462DB"  // Color de la pista izquierda
+                    maximumTrackTintColor="#ccc"  // Color de la pista derecha
+                    style={styles.slider}  // Estilo del slider
+                />
 
 
-            {/* Botón para enviar la reseña */}
-            <Button title="Submit Review" onPress={handleSubmitReview} />
-        </View>
+                {/* Botón para enviar la reseña */}
+                <Button title="Submit Review" onPress={handleSubmitReview} />
+            </View>
+        </>
     );
 };
 

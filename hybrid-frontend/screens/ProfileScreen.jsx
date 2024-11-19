@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
 import { API, PORT } from '@env';
 import { jwtDecode } from "jwt-decode";
+import DropdownMenu from '../utils/DropdownMenu';
 
 const initialState = {
     loading: true,
@@ -91,37 +92,52 @@ const ProfileScreen = () => {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007BFF" />
-                <Text style={styles.loadingText}>Loading profile...</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#007BFF" />
+                    <Text style={styles.loadingText}>Loading profile...</Text>
+                </View>
+            </>
         );
     }
 
     if (error) {
         return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            </>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>User Profile</Text>
-            {user && (
-                <>
-                    <Text style={styles.infoText}>Name: {user.first_name} {user.last_name}</Text>
-                    <Text style={styles.infoText}>Email: {user.email}</Text>
-                    <Text style={styles.infoText}>Age: {user.age}</Text>
-                    {/* <Text style={styles.infoText}>Address: {user.address.line1}, {user.address.city}, {user.address.country}</Text> */}
-                </>
-            )}
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.title}>User Profile</Text>
+                {user && (
+                    <>
+                        <Text style={styles.infoText}>Name: {user.first_name} {user.last_name}</Text>
+                        <Text style={styles.infoText}>Email: {user.email}</Text>
+                        <Text style={styles.infoText}>Age: {user.age}</Text>
+                        {/* <Text style={styles.infoText}>Address: {user.address.line1}, {user.address.city}, {user.address.country}</Text> */}
+                    </>
+                )}
 
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Text style={styles.logoutButtonText}>Logout</Text>
-            </TouchableOpacity>
-        </View>
+                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                    <Text style={styles.logoutButtonText}>Logout</Text>
+                </TouchableOpacity>
+            </View>
+        </>
     );
 };
 
@@ -130,6 +146,8 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#F5F5F5',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     loadingContainer: {
         flex: 1,

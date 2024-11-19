@@ -2,6 +2,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TextInput, FlatList, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
+import DropdownMenu from '../utils/DropdownMenu';
 
 // Estado inicial para el reducer
 const initialState = {
@@ -77,43 +78,58 @@ const UsersScreen = ({ navigation }) => {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007BFF" />
-                <Text style={styles.loadingText}>Loading users...</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#007BFF" />
+                    <Text style={styles.loadingText}>Loading users...</Text>
+                </View>
+            </>
         );
     }
 
     if (error) {
         return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            </>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Search for Users</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Type user handle"
-                value={query}
-                onChangeText={setQuery}
-            />
-            <FlatList
-                data={filteredUsers}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('User', { userId: item.id })}>
-                        <View style={styles.userContainer}>
-                            <Text style={styles.userName}>{item.handle}</Text>
-                        </View>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={<Text style={styles.noUsersText}>No users availables</Text>}
-            />
-        </View>
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.title}>Search for Users</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Type user handle"
+                    value={query}
+                    onChangeText={setQuery}
+                />
+                <FlatList
+                    data={filteredUsers}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => navigation.navigate('User', { userId: item.id })}>
+                            <View style={styles.userContainer}>
+                                <Text style={styles.userName}>{item.handle}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                    ListEmptyComponent={<Text style={styles.noUsersText}>No users availables</Text>}
+                />
+            </View>
+        </>
     );
 };
 
