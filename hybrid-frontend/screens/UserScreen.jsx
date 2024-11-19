@@ -2,6 +2,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, Alert, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
+import DropdownMenu from '../utils/DropdownMenu';
 
 const initialState = {
     loading: true,
@@ -108,50 +109,65 @@ const UserScreen = ({ route, navigation }) => {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007BFF" />
-                <Text style={styles.loadingText}>Loading user information...</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#007BFF" />
+                    <Text style={styles.loadingText}>Loading user information...</Text>
+                </View>
+            </>
         );
     }
 
     if (error) {
         return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            </>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.userName}>{user.handle}</Text>
-            {friendRequestSent ? (
-                <Text style={styles.friendRequestText}>Friend request sent!</Text>
-            ) : (
-                <TouchableOpacity style={styles.friendRequestButton} onPress={handleSendFriendRequest}>
-                    <Text style={styles.friendRequestButtonText}>Send Friend Request</Text>
-                </TouchableOpacity>
-            )}
-            <Text style={styles.sectionTitle}>Reviews</Text>
-            {user.reviews.length === 0 ? (
-                <Text style={styles.noReviewsText}>No reviews made by this user</Text>
-            ) : (
-                <FlatList
-                    data={user.reviews}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.userName}>{user.handle}</Text>
+                {friendRequestSent ? (
+                    <Text style={styles.friendRequestText}>Friend request sent!</Text>
+                ) : (
+                    <TouchableOpacity style={styles.friendRequestButton} onPress={handleSendFriendRequest}>
+                        <Text style={styles.friendRequestButtonText}>Send Friend Request</Text>
+                    </TouchableOpacity>
+                )}
+                <Text style={styles.sectionTitle}>Reviews</Text>
+                {user.reviews.length === 0 ? (
+                    <Text style={styles.noReviewsText}>No reviews made by this user</Text>
+                ) : (
+                    <FlatList
+                        data={user.reviews}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
                             style={styles.reviewContainer}
                             onPress={() => navigation.navigate('Beer', { beerId: item.beer_id, beerName: item.beer_name })}
                         >
-                            <Text style={styles.reviewText}>{item.text}</Text>
-                            <Text style={styles.reviewRating}>Rating: {item.rating}</Text>
-                        </TouchableOpacity>
-                    )}
-                />
-            )}
-        </View>
+                                <Text style={styles.reviewText}>{item.text}</Text>
+                                <Text style={styles.reviewRating}>Rating: {item.rating}</Text>
+                            </TouchableOpacity>
+                        )}
+                    />
+                )}
+            </View>
+        </>
     );
 };
 

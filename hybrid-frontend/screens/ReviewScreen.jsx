@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert, Keyboard } from 'react-native';
-import Slider from '@react-native-community/slider'; // Correct Import
+import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
+import { Keyboard } from 'react-native';
+import { Slider } from '@rneui/themed';
 import { API, PORT } from '@env';
 
 const ReviewScreen = ({ route, navigation }) => {
@@ -11,29 +12,29 @@ const ReviewScreen = ({ route, navigation }) => {
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
+    console.log(`API: ${api}, PORT: ${port}`);
+
     const handleSubmitReview = async () => {
         if (reviewText.length < 15) {
             Alert.alert('Error', 'The review must be at least 15 characters long.');
             return;
         }
-
-        const formattedRating = Math.round(rating * 10) / 10;
-
         const reviewData = {
             review: {
                 text: reviewText,
-                rating: formattedRating,
+                rating: parseFloat(rating.toFixed(1)), // Ensure rating is rounded to one decimal place
                 beer_id: beerId,
             },
         };
 
         try {
+
             const token = await AsyncStorage.getItem('jwt');
             const response = await fetch(`http://${api}:${port}/api/v1/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(reviewData),
             });
@@ -42,6 +43,7 @@ const ReviewScreen = ({ route, navigation }) => {
 
             if (response.ok) {
                 Alert.alert('Success', 'Review submitted successfully');
+                // Navega de vuelta a otra pantalla si es necesario
                 navigation.goBack({ refresh: true });
             } else {
                 Alert.alert('Error', `Failed to submit review: ${result.message || 'Unknown error'}`);
@@ -55,7 +57,7 @@ const ReviewScreen = ({ route, navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Review for Beer ID: {beerId}</Text>
-            
+            {/* Caja de texto para la reseña */}
             <TextInput
                 style={styles.input}
                 placeholder="Write your review here"
@@ -63,26 +65,25 @@ const ReviewScreen = ({ route, navigation }) => {
                 onChangeText={setReviewText}
                 multiline
                 onSubmitEditing={() => Keyboard.dismiss()}
-                blurOnSubmit
+                blurOnSubmit={true}
             />
 
+            {/* Slider para el rating */}
             <Text style={styles.subHeader}>Rate this beer: {rating.toFixed(1)}</Text>
-
             <Slider
-                style={styles.slider} // Apply explicit styling
-                value={rating}
-                onValueChange={(value) => {
-                    const roundedValue = Math.round(value * 10) / 10;
-                    setRating(roundedValue);
-                }}
-                minimumValue={1}
-                maximumValue={5}
-                step={0.1}
-                minimumTrackTintColor="#1462DB"
-                maximumTrackTintColor="#ccc"
-                thumbTintColor="#1462DB"
-            />
+        value={rating}
+        onValueChange={setRating} // Directly set the state without `.toFixed`
+        minimumValue={1}
+        maximumValue={5}
+        step={0.1} // Allows precise steps if floats are supported
+        thumbTintColor="#1462DB"
+        minimumTrackTintColor="#1462DB"
+        maximumTrackTintColor="#ccc"
+        style={styles.slider}
+    />
 
+
+            {/* Botón para enviar la reseña */}
             <Button title="Submit Review" onPress={handleSubmitReview} />
         </View>
     );
@@ -113,8 +114,8 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     slider: {
-        width: '100%', 
-        height: 40,    
+        width: '100%',
+        height: 40,
     },
     title: {
         fontSize: 24,

@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button } from 'react-native';
 import { API, PORT } from '@env';
+import DropdownMenu from '../utils/DropdownMenu';
 
 const BeerScreen = ({ route, navigation }) => {
   const { beerId, beerName } = route.params;
@@ -72,98 +73,109 @@ const BeerScreen = ({ route, navigation }) => {
 
   if (!beer) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007BFF" />
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
+      <>
+        <View style={styles.container1}>
+            <DropdownMenu />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007BFF" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.centeredContainer}>
-        <Text style={styles.name}>{beer.name}</Text>
-        {brand && brewery && (
-          <Text style={styles.subDetail}>{brand} ({brewery})</Text>
-        )}
+    <>
+      <View style={styles.container1}>
+          <DropdownMenu />
       </View>
-      {!userReviewExists && (
-        <Button title="Write your review" onPress={() => navigation.navigate('Review', { beerId, beerName })} />
-      )}
-      <View style={styles.centeredContainer}>
-        <Button title="See reviews" onPress={() => navigation.navigate('Reviews', { beerId, beerName })} />
-      </View>
-      <View style={styles.detailsContainer}>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>Average rating:</Text>
-          <Text style={styles.detail}>
-            {beer.avg_rating ? beer.avg_rating : 'Not rated'}
-          </Text>
-        </View>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>Your rating:</Text>
-          {userReviewExists && (
-            <Text style={styles.detail}>{review[0].rating}</Text>
-          )}
-          {!userReviewExists && (
-            <Text style={styles.detail}>Not rated</Text>
+      <ScrollView style={styles.container}>
+        <View style={styles.centeredContainer}>
+          <Text style={styles.name}>{beer.name}</Text>
+          {brand && brewery && (
+            <Text style={styles.subDetail}>{brand} ({brewery})</Text>
           )}
         </View>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>Style:</Text>
-          <Text style={styles.detail}>{beer.style}</Text>
-        </View>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>Hop:</Text>
-          <Text style={styles.detail}>{beer.hop}</Text>
-        </View>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>Yeast:</Text>
-          <Text style={styles.detail}>{beer.yeast}</Text>
-        </View>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>Malts:</Text>
-          <Text style={styles.detail}>{beer.malts}</Text>
-        </View>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>IBU:</Text>
-          <Text style={styles.detail}>{beer.ibu ? beer.ibu.slice(0, -3) : 'Not available'}</Text>
-        </View>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>Alcohol:</Text>
-          <Text style={styles.detail}>{beer.alcohol}</Text>
-        </View>
-        <View style={styles.detailsSubContainer}>
-          <Text style={styles.detailTitle}>BLG:</Text>
-          <Text style={styles.detail}>{beer.blg ? beer.blg.slice(0, -3) : 'Not available'}</Text>
-        </View>
-      </View>
-
-      {userReviewExists && (
-        <View style={styles.card}>
-          <Text style={styles.detailTitle}>Your review</Text>
-          <Text style={styles.detail}>Rating: {review[0]?.rating}</Text>
-          <Text style={styles.detail}>{review[0]?.text}</Text>
-        </View>
-      )}
-      <View style={styles.detailsContainer}>
-        <Text style={styles.detailTitle}>Bars serving this beer:</Text>
-        {bars.length > 0 ? (
-          bars.map((bar) => (
-            <Text key={bar.id} style={styles.barDetail}>{bar.name}</Text>
-          ))
-        ) : (
-          <Text style={styles.detail}>No bars available</Text>
+        {!userReviewExists && (
+          <Button title="Write your review" onPress={() => navigation.navigate('Review', { beerId, beerName })} />
         )}
-      </View>
+        <View style={styles.centeredContainer}>
+          <Button title="See reviews" onPress={() => navigation.navigate('Reviews', { beerId, beerName })} />
+        </View>
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>Average rating:</Text>
+            <Text style={styles.detail}>
+              {beer.avg_rating ? beer.avg_rating : 'Not rated'}
+            </Text>
+          </View>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>Your rating:</Text>
+            {userReviewExists && (
+              <Text style={styles.detail}>{review[0].rating}</Text>
+            )}
+            {!userReviewExists && (
+              <Text style={styles.detail}>Not rated</Text>
+            )}
+          </View>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>Style:</Text>
+            <Text style={styles.detail}>{beer.style}</Text>
+          </View>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>Hop:</Text>
+            <Text style={styles.detail}>{beer.hop}</Text>
+          </View>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>Yeast:</Text>
+            <Text style={styles.detail}>{beer.yeast}</Text>
+          </View>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>Malts:</Text>
+            <Text style={styles.detail}>{beer.malts}</Text>
+          </View>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>IBU:</Text>
+            <Text style={styles.detail}>{beer.ibu ? beer.ibu.slice(0, -3) : 'Not available'}</Text>
+          </View>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>Alcohol:</Text>
+            <Text style={styles.detail}>{beer.alcohol}</Text>
+          </View>
+          <View style={styles.detailsSubContainer}>
+            <Text style={styles.detailTitle}>BLG:</Text>
+            <Text style={styles.detail}>{beer.blg ? beer.blg.slice(0, -3) : 'Not available'}</Text>
+          </View>
+        </View>
+
+        {userReviewExists && (
+          <View style={styles.card}>
+            <Text style={styles.detailTitle}>Your review</Text>
+            <Text style={styles.detail}>Rating: {review[0]?.rating}</Text>
+            <Text style={styles.detail}>{review[0]?.text}</Text>
+          </View>
+        )}
+        <View style={styles.detailsContainer}>
+          <Text style={styles.detailTitle}>Bars serving this beer:</Text>
+          {bars.length > 0 ? (
+            bars.map((bar) => (
+              <Text key={bar.id} style={styles.barDetail}>{bar.name}</Text>
+            ))
+          ) : (
+            <Text style={styles.detail}>No bars available</Text>
+          )}
+        </View>
 
 
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 40,
     flex: 1,
     padding: 20,
     backgroundColor: '#F5F5F5',

@@ -5,6 +5,7 @@ import { API, PORT } from '@env';
 import { jwtDecode } from "jwt-decode";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import DropdownMenu from '../utils/DropdownMenu';
 
 const EventScreen = ({ route }) => {
   const { eventId } = route.params;
@@ -18,8 +19,20 @@ const EventScreen = ({ route }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [api, setAPI] = useState(API);
   const [port, setPORT] = useState(PORT);
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
 
   useEffect(() => {
+
+    const formatDateTime = (dateTime) => {
+      const [date, time] = dateTime.split('T'); // Separate date and time
+      const [hour, minute] = time.split(':'); // Extract hour and minute
+      const hour12 = hour % 12 || 12; // Convert to 12-hour format
+      const ampm = hour >= 12 ? 'PM' : 'AM'; // Determine AM/PM
+      const formattedTime = `${hour12}:${minute} ${ampm}`; // Format time
+      return { date, time: formattedTime };
+    };
+
     const fetchEventDetails = async () => {
       try {
         const token = await AsyncStorage.getItem('jwt');
@@ -29,11 +42,9 @@ const EventScreen = ({ route }) => {
         const data = await response.json();
         setEvent(data.event);
         setPhotos(data.photos || []);
-        console.log('data.photos:', data.photos);
-        data.photos.forEach((photo, index) => {
-          console.log(`Photo ${index + 1} tagged_users:`, photo.tagged_users);
-        });
-        console.log('Token:', token)
+        const { date, time } = formatDateTime(data.event.date);
+        setDate(date);
+        setTime(time);
       } catch (error) {
         console.error('Error fetching event details:', error);
       } finally {
@@ -116,11 +127,6 @@ const EventScreen = ({ route }) => {
     });
     formData.append('event_picture[tagged_users]', JSON.stringify(taggedUsers));
 
-    console.log("Uploading photo with the following data:");
-    console.log("Photo URI:", selectedPhoto.uri);
-    console.log("Tagged Users (JSON):", JSON.stringify(taggedUsers));
-    console.log("FormData contents:", Array.from(formData.entries()));
-
     setIsUploading(true);
     try {
       const response = await fetch(`http://${api}:${port}/api/v1/events/${eventId}/photos`, {
@@ -157,78 +163,88 @@ const EventScreen = ({ route }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007BFF" />
-        <Text>Loading Event Details...</Text>
-      </View>
+      <>
+        <View style={styles.container1}>
+            <DropdownMenu />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007BFF" />
+          <Text>Loading Event Details...</Text>
+        </View>
+      </>  
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{event.name}</Text>
-      <Text style={styles.detail}>Date: {event.date}</Text>
-      <Text style={styles.detail}>Location: {event.location}</Text>
-      <Text style={styles.detail}>Description: {event.description}</Text>
+    <>
+      <View style={styles.container1}>
+          <DropdownMenu />
+      </View>
+      <View style={styles.container}>
+        <Text style={styles.title}>{event.name}</Text>
+        <Text style={styles.detail}>Date: {date}</Text>
+        <Text style={styles.detail}>Time: {time}</Text>
+        <Text style={styles.detail}>Description: {event.description}</Text>
 
-      <Button title="Check-in" onPress={handleCheckIn} />
-      <Button title="Select Photo" onPress={handleSelectPhoto} />
+        <Button title="Check-in" onPress={handleCheckIn} />
+        <Button title="Select Photo" onPress={handleSelectPhoto} />
 
-      {selectedPhoto && (
-        <View>
-          <Text style={styles.sectionTitle}>Add Tagged Friends:</Text>
-          <Picker
-        selectedValue={selectedFriend}
-        onValueChange={(itemValue) => setSelectedFriend(itemValue)}
-      >
-        <Picker.Item label="Select a Friend" value={null} />
-        {friends.map((friend) => (
-          <Picker.Item
-            key={friend.id}
-            label={`${friend.first_name} ${friend.last_name}`}
-            value={friend.id}
-          />
-        ))}
-      </Picker>
-          <Button title="Add Friend" onPress={handleAddTaggedUser} />
-          <Text style={styles.sectionTitle}>Tagged Users:</Text>
-          {taggedUsers.map((id) => {
-            const friend = friends.find((f) => f.id === Number(id)); // Convert to number for comparison
-            return (
-              <Text key={id}>
-                {friend ? `${friend.first_name} ${friend.last_name}` : "Unknown User"}
+        {selectedPhoto && (
+          <View>
+            <Text style={styles.sectionTitle}>Add Tagged Friends:</Text>
+            <Picker
+          selectedValue={selectedFriend}
+          onValueChange={(itemValue) => setSelectedFriend(itemValue)}
+        >
+          <Picker.Item label="Select a Friend" value={null} />
+          {friends.map((friend) => (
+            <Picker.Item
+              key={friend.id}
+              label={`${friend.first_name} ${friend.last_name}`}
+              value={friend.id}
+            />
+          ))}
+        </Picker>
+            <Button title="Add Friend" onPress={handleAddTaggedUser} />
+            <Text style={styles.sectionTitle}>Tagged Users:</Text>
+            {taggedUsers.map((id) => {
+              const friend = friends.find((f) => f.id === Number(id)); // Convert to number for comparison
+              return (
+                <Text key={id}>
+                  {friend ? `${friend.first_name} ${friend.last_name}` : "Unknown User"}
+                </Text>
+              );
+            })}
+            <Button
+              title="Upload Photo"
+              onPress={handleUploadPhoto}
+              disabled={isUploading}
+            />
+          </View>
+        )}
+
+        <Text style={styles.sectionTitle}>Photos:</Text>
+        <FlatList
+        data={photos}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View>
+            <Image source={{ uri: item.url }} style={styles.photo} />
+            {item.tagged_users && item.tagged_users.length > 0 && (
+              <Text style={styles.taggedUsers}>
+                Tagged: {item.tagged_users
+                  .map((id) => {
+                    const friend = friends.find((f) => f.id === id); // Find the friend by ID
+                    return friend ? `${friend.first_name} ${friend.last_name}` : "Unknown User"; // Format name or show 'Unknown User'
+                  })
+                  .join(", ")} {/* Join names with commas */}
               </Text>
-            );
-          })}
-          <Button
-            title="Upload Photo"
-            onPress={handleUploadPhoto}
-            disabled={isUploading}
-          />
-        </View>
-      )}
-
-      <Text style={styles.sectionTitle}>Photos:</Text>
-      <FlatList
-      data={photos}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View>
-          <Image source={{ uri: item.url }} style={styles.photo} />
-          {item.tagged_users && item.tagged_users.length > 0 && (
-            <Text style={styles.taggedUsers}>
-              Tagged: {item.tagged_users
-                .map((id) => {
-                  const friend = friends.find((f) => f.id === id); // Find the friend by ID
-                  return friend ? `${friend.first_name} ${friend.last_name}` : "Unknown User"; // Format name or show 'Unknown User'
-                })
-                .join(", ")} {/* Join names with commas */}
-            </Text>
-          )}
-        </View>
-      )}
-    />
-    </View>
+            )}
+          </View>
+        )}
+      />
+      </View>
+    </>
   );
 };
 
@@ -244,32 +260,83 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
+    color: '#333',
     marginBottom: 20,
+    textAlign: 'center',
   },
   detail: {
     fontSize: 18,
-    color: '#333',
+    color: '#555',
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#black',
     marginVertical: 15,
   },
   photo: {
     width: '100%',
     height: 200,
-    borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   taggedUsers: {
     fontSize: 16,
     color: '#666',
     marginBottom: 10,
+  },
+  pickerContainer: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  addFriendText: {
+    color: '#007BFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  friendText: {
+    fontSize: 16,
+    color: '#007BFF',
+    marginVertical: 5,
+  },
+  checkInButton: {
+    backgroundColor: '#28a745',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  checkInButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

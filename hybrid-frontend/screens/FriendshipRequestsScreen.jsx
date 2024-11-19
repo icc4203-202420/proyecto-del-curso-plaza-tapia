@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, FlatList, Button } from 'rea
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
 import { jwtDecode } from 'jwt-decode';
-
+import DropdownMenu from '../utils/DropdownMenu';
 
 // Estado inicial para el reducer
 const initialState = {
@@ -110,47 +110,62 @@ const FriendshipRequestsScreen = ({ navigation }) => {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007BFF" />
-                <Text style={styles.loadingText}>Loading requests...</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#007BFF" />
+                    <Text style={styles.loadingText}>Loading requests...</Text>
+                </View>
+            </>
         );
     }
 
     if (error) {
         return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            </>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Friendship Requests</Text>
-            <FlatList
-                data={requests}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.requestContainer}>
-                        <Text style={styles.requestText}>{item.sender_handle}</Text>
-                        <View style={styles.buttonContainer}>
-                            <Button
-                                title="Accept"
-                                onPress={() => handleAccept(item.id, fetchRequests)}
-                                color="#28a745"
-                            />
-                            <Button
-                                title="Reject"
-                                onPress={() => handleReject(item.id, fetchRequests)}
-                                color="#dc3545"
-                            />
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.title}>Friendship Requests</Text>
+                <FlatList
+                    data={requests}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <View style={styles.requestContainer}>
+                            <Text style={styles.requestText}>{item.sender_handle}</Text>
+                            <View style={styles.buttonContainer}>
+                                <Button
+                                    title="Accept"
+                                    onPress={() => handleAccept(item.id, fetchRequests)}
+                                    color="#28a745"
+                                />
+                                <Button
+                                    title="Reject"
+                                    onPress={() => handleReject(item.id, fetchRequests)}
+                                    color="#dc3545"
+                                />
+                            </View>
                         </View>
-                    </View>
-                )}
-                ListEmptyComponent={<Text style={styles.noRequestsText}>No friendship requests available</Text>}
-            />
-        </View>
+                    )}
+                    ListEmptyComponent={<Text style={styles.noRequestsText}>No friendship requests available</Text>}
+                />
+            </View>
+        </>
     );
 };
 

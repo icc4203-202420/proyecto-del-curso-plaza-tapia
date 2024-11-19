@@ -3,9 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, TouchableOpacity } from 'react-native';
-import React, { useState }  from 'react';
+import React from 'react';
 import { NotificationProvider } from './utils/NotificationContext';
-import { API, PORT } from '@env';
 
 import FriendshipRequestsScreen from './screens/FriendshipRequestsScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -24,7 +23,6 @@ import HomeScreen from './screens/HomeScreen';
 import BarsScreen from './screens/BarsScreen';          // Nueva pantalla de lista de bares
 import BarScreen from './screens/BarScreen';
 import EventScreen from './screens/EventScreen';
-import FeedScreen from './screens/FeedScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -69,7 +67,6 @@ const App = () => {
           <Stack.Screen name="Home" component={HomeScreen} options={({ navigation }) => screenOptions(navigation)} />
           <Stack.Screen name="Bar" component={BarScreen} options={({ navigation }) => screenOptions(navigation)} />
           <Stack.Screen name="Event" component={EventScreen} options={({ navigation }) => screenOptions(navigation)} />
-          <Stack.Screen name="Feed" component={FeedScreen} options={({ navigation }) => screenOptions(navigation)} />
         </Stack.Navigator>
       </NavigationContainer>
     </NotificationProvider>

@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import DropdownMenu from '../utils/DropdownMenu';
 
 const BeersScreen = ({ navigation }) => {
     const [query, setQuery] = useState('');
@@ -46,27 +47,32 @@ const BeersScreen = ({ navigation }) => {
 
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Search for Beers</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Type beer name"
-                value={query}
-                onChangeText={handleSearch}
-            />
-            <FlatList
-                data={filteredBeers}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('Beer', { beerId: item.id, beerName: item.name })} >
-                        <View style={styles.beerItem}>
-                            <Text style={styles.beerName}>{item.name}</Text>
-                            <Text>{item.description}</Text>
-                        </View>
-                    </TouchableOpacity>
-                )}
-            />
-        </View>
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.title}>Search for Beers</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Type beer name"
+                    value={query}
+                    onChangeText={handleSearch}
+                />
+                <FlatList
+                    data={filteredBeers}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => navigation.navigate('Beer', { beerId: item.id })} >
+                            <View style={styles.beerItem}>
+                                <Text style={styles.beerName}>{item.name}</Text>
+                                <Text>{item.description}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                />
+            </View>
+        </>
     );
 };
 

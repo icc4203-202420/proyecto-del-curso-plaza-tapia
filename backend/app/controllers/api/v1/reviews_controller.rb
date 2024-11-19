@@ -54,7 +54,9 @@ class API::V1::ReviewsController < ApplicationController
     friends = user.friends
     reviews = Review.where(user: friends).order(created_at: :desc)
     reviews_complete = reviews.map do |review|
-      review.as_json.merge(handle: review.user.handle, beer_name: review.beer.name)
+      review.as_json.merge(
+        handle: review.user.handle,
+        beer_name: review.beer.name)
     end
     render json: { reviews: reviews_complete }
   end

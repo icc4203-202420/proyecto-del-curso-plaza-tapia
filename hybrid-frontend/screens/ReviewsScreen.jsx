@@ -2,6 +2,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API, PORT } from '@env';
+import DropdownMenu from '../utils/DropdownMenu';
 
 // Estado inicial para el reducer
 const initialState = {
@@ -65,35 +66,50 @@ const ReviewsScreen = ({ route }) => {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007BFF" />
-                <Text style={styles.loadingText}>Cargando reseñas...</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#007BFF" />
+                    <Text style={styles.loadingText}>Cargando reseñas...</Text>
+                </View>
+            </>
         );
     }
 
     if (error) {
         return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
+            <>
+                <View style={styles.container1}>
+                    <DropdownMenu />
+                </View>
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            </>
         );
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.beerName}>{beerName} Reviews</Text>
+        <>
+            <View style={styles.container1}>
+                <DropdownMenu />
+            </View>
+            <ScrollView style={styles.container}>
+                <Text style={styles.beerName}>{beerName} Reviews</Text>
             {reviews.length > 0 ? (
-                reviews.map((review) => (
-                    <View key={review.id} style={styles.reviewContainer}>
-                        <Text style={styles.reviewText}>{review.text}</Text>
-                        <Text style={styles.reviewRating}>Rating: {review.rating}</Text>
-                    </View>
-                ))
-            ) : (
-                <Text style={styles.noReviewsText}>There are no reviews for this beer</Text>
-            )}
-        </ScrollView>
+                    reviews.map((review) => (
+                        <View key={review.id} style={styles.reviewContainer}>
+                            <Text style={styles.reviewText}>{review.text}</Text>
+                            <Text style={styles.reviewRating}>Rating: {review.rating}</Text>
+                        </View>
+                    ))
+                ) : (
+                    <Text style={styles.noReviewsText}>There are no reviews for this beer</Text>
+                )}
+            </ScrollView>
+        </>
     );
 };
 
@@ -106,6 +122,7 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     container: {
+        marginTop: 40,
         flex: 1,
         padding: 20,
         backgroundColor: '#F5F5F5',
