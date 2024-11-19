@@ -19,7 +19,18 @@ class API::V1::ReviewsController < ApplicationController
   def create
     @review = @user.reviews.build(review_params)
     if @review.save
+      beer = @review.beer
+      beer.update_avg_rating
       render json: @review, status: :created, location: api_v1_review_url(@review)
+      
+      # Emite la reseña a los amigos del usuario
+      @user.friends.each do |friend|
+        FeedChannel.broadcast_to(friend, {
+          type: 'new_review',
+          review: @review,
+          beer: { id: beer.id, name: beer.name }
+        })
+      end
     else
       render json: @review.errors, status: :unprocessable_entity
     end
@@ -38,18 +49,31 @@ class API::V1::ReviewsController < ApplicationController
     head :no_content
   end
 
+  def friends_reviews
+    user = current_user
+    friends = user.friends
+    reviews = Review.where(user: friends).order(created_at: :desc)
+    reviews_complete = reviews.map do |review|
+      review.as_json.merge(
+        handle: review.user.handle,
+        beer_name: review.beer.name)
+    end
+    render json: { reviews: reviews_complete }
+  end
+
   private
+
+  def set_user
+    @user = current_user
+  end
 
   def set_review
     @review = Review.find_by(id: params[:id])
     render json: { error: "Review not found" }, status: :not_found unless @review
   end
 
-  def set_user
-    @user = User.find(params[:user_id]) 
-  end
-
   def review_params
-    params.require(:review).permit(:id, :text, :rating, :beer_id)
+    params.require(:review).permit(:text, :rating, :beer_id).merge(user_id: params[:user_id])
   end
-end
+  
+end 

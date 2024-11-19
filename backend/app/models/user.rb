@@ -21,6 +21,12 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :reviews, allow_destroy: true
   accepts_nested_attributes_for :address, allow_destroy: true
 
+  # Solicitudes de amistad enviadas por el usuario
+  has_many :sent_friendship_requests, class_name: 'FriendshipRequest', foreign_key: 'sender_id'
+  has_many :received_friendship_requests, class_name: 'FriendshipRequest', foreign_key: 'receiver_id'
+  has_many :pending_friends, through: :sent_friendship_requests, source: :receiver
+  has_many :pending_friend_requests, through: :received_friendship_requests, source: :sender
+
   # Amistades iniciadas por el usuario
   has_many :friendships
   has_many :friends, through: :friendships, source: :friend
@@ -30,6 +36,12 @@ class User < ApplicationRecord
   has_many :inverse_friends, through: :inverse_friendships, source: :user  
 
   def generate_jwt
-    Warden::JWTAuth::UserEncoder.new.call(self, :user, nil)[0]
+    payload = {user_id: self.id, exp: 24.hours.from_now.to_i}
+    JWT.encode(payload, Rails.application.credentials.secret_key_base)
   end
+
+  def update_notification_token(token)
+    update(notification_token: token)
+  end
+
 end

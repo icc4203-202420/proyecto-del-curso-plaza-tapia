@@ -3,6 +3,7 @@ class API::V1::EventsController < ApplicationController
   include Authenticable
 
   respond_to :json
+  before_action :set_user, only: [:attendee]
   before_action :set_event, only: [:show, :update, :destroy]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
@@ -12,13 +13,23 @@ class API::V1::EventsController < ApplicationController
   end
 
   def show
+    event_photos = @event.event_pictures.map do |event_picture|
+      {
+        id: event_picture.id,
+        description: event_picture.description,
+        url: event_picture.photo.attached? ? url_for(event_picture.photo) : nil,
+        tagged_users: event_picture.tagged_users
+      }
+    end
+
     if @event.flyer.attached?
-      render json:@event.as_json.merge({
+      render json: @event.as_json.merge({
         image_url: url_for(@event.flyer),
-        thumbnail_url: url_for(@event.thumbnail)}),
-        status: :ok
+        thumbnail_url: url_for(@event.thumbnail),
+        photos: event_photos
+      }), status: :ok
     else
-      render json: { event: @event.as_json }, status: :ok
+      render json: { event: @event.as_json, photos: event_photos }, status: :ok     
     end
   end
 
@@ -49,9 +60,19 @@ class API::V1::EventsController < ApplicationController
     end
   end
 
+  def attendee
+    event = Event.find(params[:id])
+    attendee = Attendance.where(event_id: event.id, user_id: @user.id).present?
+    render json: { attendee: attendee }, status: :ok
+  end
+
   private
 
-  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = current_user
+  end
+  
+
   def set_event
     @event = Event.find_by(id: params[:id])
     render json: { error: 'Event not found' }, status: :not_found unless @event

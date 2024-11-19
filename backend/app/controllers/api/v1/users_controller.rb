@@ -2,19 +2,38 @@ class API::V1::UsersController < ApplicationController
   include Authenticable
 
   respond_to :json
-  before_action :set_user, only: [:show, :update, :friendships, :create_friendship]
-  before_action :verify_jwt_token, only: [:update, :destroy, :create_friendship]  
+  before_action :set_user, only: [:index, :update, :friends, :create_friendship]
+  before_action :verify_jwt_token, only: [:update, :destroy, :create_friendship]
+  skip_before_action :authorize_request, only: [:create]
   
   def index
-    @users = User.includes(:reviews, :address).all   
+    @users = User.includes(:reviews, :address).where.not(id: @user.id)
+    friendship = Friendship.find_by(user_id: @user.id, friend_id: params[:id]).present?
+    render json: {
+      users: @users.as_json(include: [:reviews, :address]),
+      friendship: friendship
+      },
+      status: :ok
   end
 
   def show
-  
+    @user = User.find(params[:id])
+    render json: { user: @user.as_json(include: [:reviews, :address]) }, status: :ok
   end
 
   def create
+    if user_params.dig(:address_attributes, :country_name)
+      country = Country.find_or_create_by(name: user_params[:address_attributes][:country_name])
+      if country
+        params[:user][:address_attributes][:country_id] = country.id
+      else
+        return render json: { error: "Invalid country name" }, status: :unprocessable_entity
+      end
+      params[:user][:address_attributes].delete(:country_name)
+    end
+  
     @user = User.new(user_params)
+  
     if @user.save
       render json: @user.id, status: :ok
     else
@@ -23,7 +42,6 @@ class API::V1::UsersController < ApplicationController
   end
 
   def update
-    #byebug
     if @user.update(user_params)
       render :show, status: :ok, location: api_v1_users_path(@user)
     else
@@ -31,11 +49,18 @@ class API::V1::UsersController < ApplicationController
     end
   end
 
+  def friends
+    @friend = User.find(params[:friend_id])
+    friends = Friendship.where(user_id: @user.id, friend_id: @friend.id).present?
+    render json: { friends: friends }, status: :ok
+  end
+
   def friendships
-    friendships = @user.friendships.map do |friendship|
-      User.find(friendship.friend_id)
-    end
-    render json: friendships, status: :ok
+    user = User.find(params[:id])
+    friend_ids = Friendship.where(user_id: user.id).pluck(:friend_id)
+    @friends = User.where(id: friend_ids)
+
+    render json: { friends: @friends }, status: :ok
   end
 
   def create_friendship
@@ -51,18 +76,25 @@ class API::V1::UsersController < ApplicationController
     
   end
 
+  def token
+    user = User.find(params[:id])
+    if user.update_notification_token(params[:token])
+      render json: { message: 'Token updated' } # Asegúrate de que 'notification_token' sea el atributo correcto
+    else
+      render json: { error: 'Failed to update token' }, status: :not_found
+    end
+  end
+
   private
 
   def set_user
-    @user = User.find(params[:id])
+    @user = current_user
   end
 
   def user_params
-    params.fetch(:user, {}).
-        permit(:id, :first_name, :last_name, :email, :age,
-            { address_attributes: [:id, :line1, :line2, :city, :country, :country_id, 
-              country_attributes: [:id, :name]],
-              reviews_attributes: [:id, :text, :rating, :beer_id, :_destroy]
-            })
+    params.require(:user).permit(
+      :first_name, :last_name, :email, :handle, :password, :password_confirmation,
+      address_attributes: [:line1, :line2, :city, :country_name]
+    )
   end
 end

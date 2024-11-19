@@ -1,5 +1,6 @@
 {
   "expo": {
+    "newArchEnabled": true,
     "name": "hybrid-frontend",
     "slug": "hybrid-frontend",
     "version": "1.0.0",
@@ -12,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Esta aplicación necesita acceder a tu biblioteca de fotos para cargar imágenes en eventos.",
+        "NSCameraUsageDescription": "Esta aplicación necesita acceso a tu cámara para tomar fotos para eventos."
+      }
     },
     "android": {
       "adaptiveIcon": {
