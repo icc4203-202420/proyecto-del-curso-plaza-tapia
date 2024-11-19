@@ -59,6 +59,8 @@ Rails.application.routes.draw do
         end
       end
 
+      get 'attendee', to: 'event#attendee'
+      get 'friends', to: 'users#friends'
       get 'friends_reviews', to: 'reviews#friends_reviews'
       get 'friends_photos', to: 'event_pictures#friends_photos'
       get 'friends_attendances', to: 'attendances#friends_attendances'

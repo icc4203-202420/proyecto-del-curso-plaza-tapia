@@ -27,6 +27,7 @@ const UserScreen = ({ route, navigation }) => {
     const { userId } = route.params; // Obtener el ID del usuario desde los parámetros de navegación
     const [state, dispatch] = useReducer(reducer, initialState);
     const [friendRequestSent, setFriendRequestSent] = useState(false); // Estado para la solicitud de amistad
+    const [friends, setFriends] = useState('');
     const [api, setAPI] = useState(API);
     const [port, setPORT] = useState(PORT);
 
@@ -39,19 +40,28 @@ const UserScreen = ({ route, navigation }) => {
 
             try {
                 const token = await AsyncStorage.getItem('jwt');
-                const response = await fetch(`http://${api}:${port}/api/v1/users/${userId}`, {
+                const response1 = await fetch(`http://${api}:${port}/api/v1/users/${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 });
-                const data = await response.json();
+                const data = await response1.json();
 
-                if (response.ok) {
+                if (response1.ok) {
                     dispatch({ type: 'FETCH_SUCCESS', payload: data.user });
                 } else {
                     dispatch({ type: 'FETCH_FAILURE', payload: 'Failed to load user details' });
                 }
+                const response2 = await fetch(`http://${api}:${port}/api/v1/friends?friend_id=${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const friendsData = await response2.json();
+                setFriends(friendsData.friends);
+                console.log('Friends:', friends);
             } catch (error) {
                 dispatch({ type: 'FETCH_FAILURE', payload: 'Failed to load user details' });
             }
@@ -141,12 +151,14 @@ const UserScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.container}>
                 <Text style={styles.userName}>{user.handle}</Text>
-                {friendRequestSent ? (
-                    <Text style={styles.friendRequestText}>Friend request sent!</Text>
-                ) : (
-                    <TouchableOpacity style={styles.friendRequestButton} onPress={handleSendFriendRequest}>
-                        <Text style={styles.friendRequestButtonText}>Send Friend Request</Text>
-                    </TouchableOpacity>
+                {!friends && (
+                    friendRequestSent ? (
+                        <Text style={styles.friendRequestText}>Friend request sent!</Text>
+                    ) : (
+                        <TouchableOpacity style={styles.friendRequestButton} onPress={handleSendFriendRequest}>
+                            <Text style={styles.friendRequestButtonText}>Send Friend Request</Text>
+                        </TouchableOpacity>
+                    )
                 )}
                 <Text style={styles.sectionTitle}>Reviews</Text>
                 {user.reviews.length === 0 ? (

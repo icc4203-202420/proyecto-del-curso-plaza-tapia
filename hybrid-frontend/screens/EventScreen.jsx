@@ -21,6 +21,8 @@ const EventScreen = ({ route }) => {
   const [port, setPORT] = useState(PORT);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
 
@@ -40,8 +42,12 @@ const EventScreen = ({ route }) => {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         const data = await response.json();
+        console.log(data);
         setEvent(data.event);
+        console.log(event);
         setPhotos(data.photos || []);
+        setName(data.event.name);
+        setDescription(data.event.description);
         const { date, time } = formatDateTime(data.event.date);
         setDate(date);
         setTime(time);
@@ -181,10 +187,10 @@ const EventScreen = ({ route }) => {
           <DropdownMenu />
       </View>
       <View style={styles.container}>
-        <Text style={styles.title}>{event.name}</Text>
+        <Text style={styles.title}>{name}</Text>
         <Text style={styles.detail}>Date: {date}</Text>
         <Text style={styles.detail}>Time: {time}</Text>
-        <Text style={styles.detail}>Description: {event.description}</Text>
+        <Text style={styles.detail}>Description: {description}</Text>
 
         <Button title="Check-in" onPress={handleCheckIn} />
         <Button title="Select Photo" onPress={handleSelectPhoto} />

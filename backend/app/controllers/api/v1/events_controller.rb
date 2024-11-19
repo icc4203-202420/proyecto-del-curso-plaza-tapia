@@ -3,6 +3,7 @@ class API::V1::EventsController < ApplicationController
   include Authenticable
 
   respond_to :json
+  before_action :set_user, only: [:attendee]
   before_action :set_event, only: [:show, :update, :destroy]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
@@ -59,9 +60,19 @@ class API::V1::EventsController < ApplicationController
     end
   end
 
+  def attendee
+    event = Event.find(params[:id])
+    attendee = Attendance.where(event_id: event.id, user_id: @user.id).present?
+    render json: { attendee: attendee }, status: :ok
+  end
+
   private
 
-  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = current_user
+  end
+  
+
   def set_event
     @event = Event.find_by(id: params[:id])
     render json: { error: 'Event not found' }, status: :not_found unless @event
